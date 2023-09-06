@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
@@ -54,8 +55,7 @@ const userSchema = new Schema({
   address: {
     address_1: {
       type: String,
-      maxlength: 20,
-      required: true
+      maxlength: 20
     },
     address_2: {
       type: String,
@@ -63,8 +63,10 @@ const userSchema = new Schema({
     }
   },
   phone: {
+    // ! Sparse is for unique fields that can be null
     type: String,
     match: /^\+(52|52)?\s?(\d{1,4}(\s|-)?\d{2,4}(\s|-)?\d{2,4}(\s|-)?\d{2,4})$/,
+    sparse: true,
     unique: true
   },
   documentPhoto: {
@@ -79,6 +81,30 @@ const userSchema = new Schema({
   }
 });
 
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(this.password, salt);
+    this.password = hashedPassword;
+    next();
+  } catch (error) {
+    next(error);
+    throw new Error('Error hashing password');
+  }
+});
+
+// userSchema.post('save', async function (next) {
+//   try {
+//     this.photo = `https://api.dicebear.com/7.x/identicon/svg?seed=${
+//       Math.floor(Math.random() * 90000) + 10000
+//     }`;
+//   } catch (error) {
+//     next(error);
+//     throw new Error('Error generating photo');
+//   }
+// });
+
 userSchema.methods.toJSON = function () {
   let obj = this.toObject();
   delete obj.__v;
@@ -87,4 +113,4 @@ userSchema.methods.toJSON = function () {
   return obj;
 };
 
-export const User = model('user', userSchema);
+export const User = model('Users', userSchema, 'Users');
