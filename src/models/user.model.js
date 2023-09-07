@@ -105,6 +105,10 @@ userSchema.pre('save', async function (next) {
 //   }
 // });
 
+userSchema.methods.comparePassword = async function (clientPassword) {
+  return await bcrypt.compare(clientPassword, this.password);
+};
+
 userSchema.methods.toJSON = function () {
   let obj = this.toObject();
   delete obj.__v;

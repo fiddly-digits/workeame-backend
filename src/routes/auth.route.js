@@ -1,10 +1,19 @@
 import express from 'express';
-import { login, register } from '../controllers/auth.controller.js';
+import {
+  infoUser,
+  login,
+  register,
+  refreshToken,
+  logout
+} from '../controllers/auth.controller.js';
 import {
   emailValidation,
   passwordValidation
 } from '../helpers/user.helpers.js';
-import { fieldValidation } from '../middlewares/user.middleware.js';
+import {
+  fieldValidation,
+  requireToken
+} from '../middlewares/user.middleware.js';
 
 const router = express.Router();
 router.post(
@@ -16,5 +25,11 @@ router.post(
 );
 
 router.post('/login', login);
+
+router.get('/protected', requireToken, infoUser);
+
+router.get('/refresh', refreshToken);
+
+router.get('/logout', logout);
 
 export default router;
