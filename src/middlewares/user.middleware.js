@@ -17,7 +17,7 @@ export const fieldValidation = (req, res, next) => {
 
 // * validate params for password and email registration
 export const userDataValidator = [
-  body('email', 'Email format not valid').trim().isEmail().normalizeEmail(),
+  body('email', 'Email format not valid').trim().isEmail(),
   body('password', 'password must be at least 8 characters long')
     .trim()
     .isLength({ min: 8 })
@@ -33,5 +33,10 @@ export const userDataValidator = [
         throw new Error('password must contain at least one special character');
       return value;
     }),
+  fieldValidation
+];
+
+export const mailValidator = [
+  body('email', 'Email format not valid').trim().isEmail(),
   fieldValidation
 ];

@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-
 const { SECRET_KEY, MODE, REFRESH_KEY } = process.env;
 
 export const generateToken = (uid) => {

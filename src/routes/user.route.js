@@ -3,6 +3,7 @@ import { register, remove } from '../controllers/user.controller.js';
 import { userDataValidator } from '../middlewares/user.middleware.js';
 import { auth } from '../middlewares/auth.middleware.js';
 import createError from 'http-errors';
+import { verifyEmail } from '../controllers/token.controller.js';
 const router = express.Router();
 
 // * Register new User
@@ -12,8 +13,19 @@ router.post('/register', userDataValidator, async (req, res) => {
     const createdUser = await register(req.body);
 
     // ! Mail confirmation
+    let validation = verifyEmail(
+      createdUser.id,
+      createdUser.email,
+      createdUser.name
+    );
 
-    return res.status(201).json({ success: true, user: createdUser });
+    console.log(validation);
+
+    return res.status(201).json({
+      success: true,
+      user: createdUser,
+      validation
+    });
   } catch (error) {
     console.log('Error status and message: ', error.status, error.message);
     return res

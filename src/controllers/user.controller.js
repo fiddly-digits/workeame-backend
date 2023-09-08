@@ -20,6 +20,7 @@ export const login = async (data, res) => {
   if (!user) throw createError(403, 'User not found');
   const passwordMatch = await user.comparePassword(password);
   if (!passwordMatch) throw createError(403, 'Incorrect password');
+  if (!user.isVerified) throw createError(401, 'User not verified');
 
   // ! jwt
   const tokenData = generateToken(user.id);
