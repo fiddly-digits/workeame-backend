@@ -1,31 +1,37 @@
-import { validationResult } from 'express-validator';
+import { validationResult, body } from 'express-validator';
 import jwt from 'jsonwebtoken';
 
-const { SECRET_KEY } = process.env;
+const { SECRET_KEY, REFRESH_KEY } = process.env;
 
+// * validate params for scripts
 export const fieldValidation = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() }); // 400 Bad Request
+    return res.status(400).json({
+      success: false,
+      message: errors.array().map((error) => error.msg)
+    }); // 400 Bad Request
   }
   next();
 };
 
-export const requireToken = (req, res, next) => {
-  try {
-    const token = req.headers?.authorization.split(' ')[1];
-    if (!token)
-      return res
-        .status(401)
-        .json({ success: false, message: 'No token provided' });
-
-    const decoded = jwt.verify(token, SECRET_KEY);
-    req.uid = decoded.uid;
-    next();
-  } catch (error) {
-    console.log(error);
-    return res
-      .status(error.status || 500)
-      .json({ success: false, message: error.message });
-  }
-};
+// * validate params for password and email registration
+export const userDataValidator = [
+  body('email', 'Email format not valid').trim().isEmail().normalizeEmail(),
+  body('password', 'password must be at least 8 characters long')
+    .trim()
+    .isLength({ min: 8 })
+    .custom((value, { req }) => {
+      const specialCharacterRegex = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\]/;
+      const numberRegex = /[0-9]/;
+      const upperCaseRegex = /[A-Z]/;
+      if (!upperCaseRegex.test(value))
+        throw new Error('password must contain at least one uppercase letter');
+      if (!numberRegex.test(value))
+        throw new Error('password must contain at least one number');
+      if (!specialCharacterRegex.test(value))
+        throw new Error('password must contain at least one special character');
+      return value;
+    }),
+  fieldValidation
+];

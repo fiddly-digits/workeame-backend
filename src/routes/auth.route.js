@@ -1,35 +1,32 @@
 import express from 'express';
-import {
-  infoUser,
-  login,
-  register,
-  refreshToken,
-  logout
-} from '../controllers/auth.controller.js';
-import {
-  emailValidation,
-  passwordValidation
-} from '../helpers/user.helpers.js';
-import {
-  fieldValidation,
-  requireToken
-} from '../middlewares/user.middleware.js';
+import { refreshToken } from '../middlewares/auth.middleware.js';
+
+import { login } from '../controllers/user.controller.js';
+import { generateToken } from '../utils/auth.utils.js';
 
 const router = express.Router();
-router.post(
-  '/register',
-  emailValidation,
-  passwordValidation,
-  fieldValidation,
-  register
-);
 
-router.post('/login', login);
+router.post('/login', async (req, res) => {
+  try {
+    const { token, expiresIn } = await login(req.body, res);
 
-router.get('/protected', requireToken, infoUser);
+    return res.status(200).json({ success: true, token, expiresIn });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(error.status || 500)
+      .json({ success: false, message: error.message });
+  }
+});
 
-router.get('/refresh', refreshToken);
-
-router.get('/logout', logout);
+router.get('/refresh', refreshToken, async (req, res) => {
+  try {
+    const { token, expiresIn } = generateToken(req.uid);
+    return res.json({ token, expiresIn });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: 'error de server' });
+  }
+});
 
 export default router;

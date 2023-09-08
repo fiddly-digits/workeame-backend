@@ -25,7 +25,7 @@ const userSchema = new Schema({
     maxlength: 20,
     required: true
   },
-  lastname: {
+  lastName: {
     type: String,
     minlength: 3,
     maxlength: 20,
@@ -53,13 +53,22 @@ const userSchema = new Schema({
     required: true
   },
   address: {
-    address_1: {
+    street: {
       type: String,
       maxlength: 20
     },
-    address_2: {
+    city: {
       type: String,
       maxlength: 20
+    },
+    country: {
+      type: String,
+      maxlength: 20
+    },
+    postCode: {
+      type: String,
+      minlength: 5,
+      maxlength: 5
     }
   },
   phone: {
