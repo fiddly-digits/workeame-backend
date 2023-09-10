@@ -8,7 +8,9 @@ const tokenSchema = new Schema({
     required: true
   },
   token: { type: String, required: true },
-  createdAt: { type: Date, required: true, default: Date.now, expires: 43200 }
+  createdAt: { type: Date, required: true, default: Date.now(), expires: 43200 }
 });
 
 export const Token = model('Token', tokenSchema, 'Token');
+
+//! This token is for mail verification

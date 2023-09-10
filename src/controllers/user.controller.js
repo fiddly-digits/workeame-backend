@@ -181,11 +181,11 @@ export const updatePassword = async (id, data) => {
 };
 
 // * Delete User
+// TODO: Delete all user data including microsites
 export const remove = async (id) => {
   const user = await User.findByIdAndDelete(id);
   if (!user) throw createError(404, 'User not found');
   return user;
 };
 
-//TODO: Delete User
 //TODO: Update Plan

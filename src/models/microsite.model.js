@@ -9,6 +9,9 @@ const micrositeSchema = new Schema({
     type: Date,
     default: Date.now()
   },
+  modifiedAt: {
+    type: Date
+  },
   theme: {
     type: Number,
     required: true,
@@ -38,12 +41,17 @@ const micrositeSchema = new Schema({
     maxLenght: 300,
     required: true
   },
-  Owner: {
+  owner: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
     unique: true
   }
+});
+
+micrositeSchema.post('findOneAndUpdate', async function (doc) {
+  doc.modifiedAt = Date.now();
+  await doc.save();
 });
 
 export const Microsite = model('Microsite', micrositeSchema, 'Microsite');

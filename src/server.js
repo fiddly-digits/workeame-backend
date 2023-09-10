@@ -4,6 +4,7 @@ import cors from 'cors';
 // * Import Routes
 import routerUser from './routes/user.route.js';
 import routerAuth from './routes/auth.route.js';
+import routerMicrosite from './routes/microsite.route.js';
 
 export const app = express();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 // * Routes
 app.use('/api/v1/user', routerUser);
 app.use('/api/v1/auth', routerAuth);
+app.use('/api/v1/ms', routerMicrosite);
 
 // * Testing Api
 app.get('/api/v1', (req, res) => {
