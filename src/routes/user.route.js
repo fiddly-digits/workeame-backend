@@ -1,57 +1,108 @@
 import express from 'express';
-import { register, remove } from '../controllers/user.controller.js';
-import { userDataValidator } from '../middlewares/user.middleware.js';
-import { auth } from '../middlewares/auth.middleware.js';
 import createError from 'http-errors';
-import { verifyEmail } from '../controllers/token.controller.js';
+
+import {
+  register,
+  getAll,
+  getOne,
+  updateProfile,
+  updateToWorker
+} from '../controllers/user.controller.js';
+import {
+  validateEmail,
+  validatePassword,
+  validationHandler
+} from '../middlewares/verification.middleware.js';
+import { auth } from '../middlewares/auth.middleware.js';
+
 const router = express.Router();
 
 // * Register new User
-// TODO: mail confirmation
-router.post('/register', userDataValidator, async (req, res) => {
+
+router.post(
+  '/register',
+  [validateEmail, validatePassword],
+  validationHandler,
+  async (req, res) => {
+    try {
+      const createdUser = await register(req.body);
+      if (!createdUser) throw createError(400, 'Error creating user');
+      res
+        .status(201)
+        .json({ success: true, message: 'User created', data: createdUser }); // ! Remove data from response after testing
+    } catch (error) {
+      res
+        .status(error.status || 500)
+        .json({ success: false, message: error.message });
+    }
+  }
+);
+
+//*get all users
+
+router.get('/all', async (req, res) => {
   try {
-    const createdUser = await register(req.body);
+    const users = await getAll();
+    if (!users) throw createError(400, 'Error getting users');
+    res.status(200).json({ success: true, data: users });
+  } catch (error) {}
+});
 
-    // ! Mail confirmation
-    let validation = verifyEmail(
-      createdUser.id,
-      createdUser.email,
-      createdUser.name
+//* get one user by id
+
+router.get('/:id', async (req, res) => {
+  try {
+    const user = await getOne(req.params.id);
+    res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    res
+      .status(error.status || 500)
+      .json({ success: false, message: error.message });
+  }
+});
+
+//* complete profile data
+
+router.patch('/complete/:id', auth, async (req, res) => {
+  try {
+    const updatedUser = await updateProfile(
+      req.params.id,
+      req.verifiedID,
+      req.body
     );
-
-    console.log(validation);
-
-    return res.status(201).json({
+    if (!updatedUser) throw createError(400, 'Error updating user');
+    res.status(200).json({
       success: true,
-      user: createdUser,
-      validation
+      message: 'User Completed profile successfully',
+      data: updatedUser
     });
   } catch (error) {
-    console.log('Error status and message: ', error.status, error.message);
-    return res
+    res
       .status(error.status || 500)
       .json({ success: false, message: error.message });
   }
 });
 
-router.delete('/:id', auth, async (req, res) => {
+// * Update to worker type
+// TODO: Downgrade to user type
+router.patch('/worker/:id', auth, async (req, res) => {
   try {
-    if (req.uid !== req.params.id) throw createError(403, 'Unauthorized');
-    const deletedUser = remove(req.uid);
-    if (!deletedUser) throw createError(404, 'User not found');
-    res.clearCookie('refreshToken');
-    return res.status(200).json({ success: true, message: 'User deleted' });
+    const UserUpdatedToWorker = await updateToWorker(
+      req.params.id,
+      req.verifiedID,
+      req.body
+    );
+    if (!UserUpdatedToWorker) throw createError(400, 'Error updating user');
+    res.status(200).json({
+      success: true,
+      message: 'User Updated to worker successfully',
+      data: UserUpdatedToWorker
+    });
   } catch (error) {
-    console.log('Error status and message: ', error.status, error.message);
-    return res
+    res
       .status(error.status || 500)
       .json({ success: false, message: error.message });
   }
-});
-
-router.get('/logout', async (req, res) => {
-  res.clearCookie('refreshToken');
-  res.json({ success: true, message: 'Logged out' });
 });
 
 export default router;

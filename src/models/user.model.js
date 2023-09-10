@@ -94,6 +94,7 @@ const userSchema = new Schema({
   }
 });
 
+// ! Pre middleware to hash password
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   try {
@@ -107,6 +108,11 @@ userSchema.pre('save', async function (next) {
   }
 });
 
+// ! Method to compare password
+userSchema.methods.comparePassword = async function (clientPassword) {
+  return await bcrypt.compare(clientPassword, this.password);
+};
+
 // userSchema.post('save', async function (next) {
 //   try {
 //     this.photo = `https://api.dicebear.com/7.x/identicon/svg?seed=${
@@ -118,16 +124,12 @@ userSchema.pre('save', async function (next) {
 //   }
 // });
 
-userSchema.methods.comparePassword = async function (clientPassword) {
-  return await bcrypt.compare(clientPassword, this.password);
-};
-
-userSchema.methods.toJSON = function () {
-  let obj = this.toObject();
-  delete obj.__v;
-  delete obj.email;
-  delete obj.password;
-  return obj;
-};
+// userSchema.methods.toJSON = function () {
+//   let obj = this.toObject();
+//   delete obj.__v;
+//   delete obj.email;
+//   delete obj.password;
+//   return obj;
+// };
 
 export const User = model('Users', userSchema, 'Users');

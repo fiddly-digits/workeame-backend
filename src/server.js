@@ -1,23 +1,21 @@
 import express from 'express';
 import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import userRoutes from './routes/user.route.js';
-import authRoutes from './routes/auth.route.js';
 
-const app = express();
+// * Import Routes
+import routerUser from './routes/user.route.js';
+import routerAuth from './routes/auth.route.js';
 
-// * Middleware Cors, Json, CookieParser
+export const app = express();
+
+// * Middleware cors and parse.json are required to use Express
 app.use(cors());
 app.use(express.json());
-app.use(cookieParser());
 
 // * Routes
+app.use('/api/v1/user', routerUser);
+app.use('/api/v1/auth', routerAuth);
 
-app.use('/api/user', userRoutes);
-app.use('/api/auth', authRoutes);
-
-app.get('/api', (req, res) => {
-  res.json({ success: true, message: 'Welcome to the API' });
+// * Testing Api
+app.get('/api/v1', (req, res) => {
+  res.json({ success: true, message: 'Working Api Ok' });
 });
-
-export default app;
