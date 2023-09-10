@@ -21,3 +21,14 @@ export let validatePassword = body('password', 'Invalid password')
   .withMessage('Password must contain at least one number')
   .matches(/[!@#$%^&*()_+{}\[\]:;<>,.?~\\]/)
   .withMessage('Password must contain at least one special character');
+
+export let validateNewPassword = body('newPassword', 'Invalid password')
+  .trim()
+  .isLength({ min: 8 })
+  .withMessage('Password must be at least 8 characters')
+  .matches(/[A-Z]/)
+  .withMessage('Password must contain at least one uppercase letter')
+  .matches(/[0-9]/)
+  .withMessage('Password must contain at least one number')
+  .matches(/[!@#$%^&*()_+{}\[\]:;<>,.?~\\]/)
+  .withMessage('Password must contain at least one special character');

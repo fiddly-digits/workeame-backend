@@ -13,7 +13,6 @@ const userSchema = new Schema({
     unique: true,
     trim: true,
     lowercase: true,
-    select: false,
     index: { unique: true }
   },
   isVerified: {
@@ -22,7 +21,6 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    select: false,
     required: true
   },
   name: {
@@ -110,6 +108,19 @@ userSchema.pre('save', async function (next) {
   }
 });
 
+userSchema.pre('findOneAndUpdate', async function (next) {
+  if (!this._update.password) return next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(this._update.password, salt);
+    this._update.password = hashedPassword;
+    next();
+  } catch (error) {
+    next(error);
+    throw new Error('Error hashing password');
+  }
+});
+
 // ! Method to compare password
 userSchema.methods.comparePassword = async function (clientPassword) {
   return await bcrypt.compare(clientPassword, this.password);
@@ -129,8 +140,8 @@ userSchema.methods.comparePassword = async function (clientPassword) {
 userSchema.methods.toJSON = function () {
   let obj = this.toObject();
   delete obj.__v;
-  delete obj.email;
   delete obj.password;
+  delete obj.email;
   return obj;
 };
 

@@ -26,10 +26,10 @@ export const login = async (data) => {
   return token;
 };
 
-// * Get all users
+// * Get all Worker users
 
-export const getAll = async () => {
-  const users = await User.find();
+export const getAllWorkers = async () => {
+  const users = await User.find({ type: 'worker' });
   return users;
 };
 
@@ -42,9 +42,7 @@ export const getOne = async (id) => {
 };
 
 // * Update Profile for completion
-export const completeProfile = async (id, loggedID, data) => {
-  if (id !== loggedID) throw createError(401, 'Unauthorized');
-
+export const completeProfile = async (id, data) => {
   if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
 
   if (!data.address || !data.phone || !data.documentPhoto || !data.type)
@@ -59,34 +57,46 @@ export const completeProfile = async (id, loggedID, data) => {
   const { address, phone, documentPhoto, category, expYears, type } = data;
   const { street, city, postCode, country } = address;
   let user = await User.findOne({ phone });
-  if (user.id !== id) throw createError(400, 'Phone number already registered');
+  if (user && user.id !== id)
+    throw createError(400, 'Phone number already registered');
+
+  // ! I think this section is not needed
   user = await User.findById(id);
   if (!user) throw createError(404, 'User not found');
-  user.address.street = !street ? user.address.street : street;
-  user.address.city = !city ? user.address.city : city;
-  user.address.postCode = !postCode ? user.address.postCode : postCode;
-  user.address.country = !country ? user.address.country : country;
-  user.phone = !phone ? user.phone : phone;
-  user.documentPhoto = !documentPhoto ? user.documentPhoto : documentPhoto;
-  user.type = !type ? user.type : type;
-  user.category = !category ? user.category : category;
-  user.expYears = !expYears ? user.expYears : expYears;
-  user.isProfileComplete = true;
+  data.address.city = !data.address.city
+    ? user.address.city
+    : data.address.city;
+  data.address.country = !data.address.country
+    ? user.address.country
+    : data.address.country;
+  data.address.postCode = !data.address.postCode
+    ? user.address.postCode
+    : data.address.postCode;
+  data.address.street = !data.address.street
+    ? user.address.street
+    : data.address.street;
+  data.phone = !data.phone ? user.phone : data.phone;
+  data.documentPhoto = !data.documentPhoto
+    ? user.documentPhoto
+    : data.documentPhoto;
+  data.type = !data.type ? user.type : data.type;
+  data.category = !data.category ? user.category : data.category;
+  data.expYears = !data.expYears ? user.expYears : data.expYears;
+  data.isProfileComplete = true;
 
-  const userCompleted = await User.findByIdAndUpdate(id, user, {
+  const userCompleted = await User.findByIdAndUpdate(id, data, {
     returnDocument: 'after'
   });
 
   return userCompleted;
 };
 
-export const update = async (id, loggedID, data) => {
-  if (id !== loggedID) throw createError(401, 'Unauthorized');
-
+export const update = async (id, data) => {
   if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
 
   let user = await User.findOne({ phone: data.phone });
-  if (user.id !== id) throw createError(400, 'Phone number already registered');
+  if (user && user.id !== id)
+    throw createError(400, 'Phone number already registered');
 
   user = await User.findById(id);
   if (!user) throw createError(404, 'User not found');
@@ -112,10 +122,7 @@ export const update = async (id, loggedID, data) => {
 };
 
 // * Update to worker type
-// TODO: Downgrade to user type
-export const updateToWorker = async (id, loggedID, data) => {
-  if (id !== loggedID) throw createError(401, 'Unauthorized');
-
+export const updateToWorker = async (id, data) => {
   if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
 
   if (!data.category || !data.expYears)
@@ -132,5 +139,53 @@ export const updateToWorker = async (id, loggedID, data) => {
   return worker;
 };
 
+// * Update mail
+export const updateMail = async (id, data) => {
+  // !Validate that they cannot update anything else than email here
+  let user = await User.findOne({ email: data.email });
+  if (user && user.id !== id)
+    throw createError(400, 'Email already registered');
+  // ! Mail verification goes here
+
+  user = await User.findById(id);
+  if (!user) throw createError(404, 'User not found');
+
+  // user.email = data.email;
+  // user.isVerified = false;
+
+  const userWithNewMail = await User.findByIdAndUpdate(
+    id,
+    { email: data.email, isVerified: false },
+    {
+      returnDocument: 'after'
+    }
+  );
+  return userWithNewMail;
+};
+
+// * Update Password
+export const updatePassword = async (id, data) => {
+  let user = await User.findById(id);
+  console.log(id);
+  if (!user) throw createError(404, 'User not found');
+
+  const isMatch = await user.comparePassword(data.oldPassword);
+  if (!isMatch) throw createError(400, 'Invalid Password');
+
+  user = await User.findByIdAndUpdate(
+    id,
+    { password: data.newPassword },
+    { returnDocument: 'after' }
+  );
+  return user;
+};
+
+// * Delete User
+export const remove = async (id) => {
+  const user = await User.findByIdAndDelete(id);
+  if (!user) throw createError(404, 'User not found');
+  return user;
+};
+
 //TODO: Delete User
-// TODO: Update Mail and Password
+//TODO: Update Plan
