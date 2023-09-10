@@ -21,7 +21,7 @@ export const login = async (data) => {
   if (!isMatch) throw createError(400, 'Invalid credentials');
 
   const token = jwt.sign({ id: user._id }, SECRET_KEY, {
-    expiresIn: 1000 * 60 * 60 * 5
+    expiresIn: 90 * 60 // 90 minutes
   });
   return token;
 };
@@ -42,12 +42,10 @@ export const getOne = async (id) => {
 };
 
 // * Update Profile for completion
-
-export const updateProfile = async (id, loggedID, data) => {
+export const completeProfile = async (id, loggedID, data) => {
   if (id !== loggedID) throw createError(401, 'Unauthorized');
 
-  if (data['email'] || data['password'])
-    throw createError(401, 'Email and password cannot be updated here');
+  if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
 
   if (!data.address || !data.phone || !data.documentPhoto || !data.type)
     throw createError(400, 'Missing essential data');
@@ -61,7 +59,7 @@ export const updateProfile = async (id, loggedID, data) => {
   const { address, phone, documentPhoto, category, expYears, type } = data;
   const { street, city, postCode, country } = address;
   let user = await User.findOne({ phone });
-  if (user) throw createError(400, 'Phone number already registered');
+  if (user.id !== id) throw createError(400, 'Phone number already registered');
   user = await User.findById(id);
   if (!user) throw createError(404, 'User not found');
   user.address.street = !street ? user.address.street : street;
@@ -82,13 +80,43 @@ export const updateProfile = async (id, loggedID, data) => {
   return userCompleted;
 };
 
+export const update = async (id, loggedID, data) => {
+  if (id !== loggedID) throw createError(401, 'Unauthorized');
+
+  if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
+
+  let user = await User.findOne({ phone: data.phone });
+  if (user.id !== id) throw createError(400, 'Phone number already registered');
+
+  user = await User.findById(id);
+  if (!user) throw createError(404, 'User not found');
+
+  data.address.city = !data.address.city
+    ? user.address.city
+    : data.address.city;
+  data.address.country = !data.address.country
+    ? user.address.country
+    : data.address.country;
+  data.address.postCode = !data.address.postCode
+    ? user.address.postCode
+    : data.address.postCode;
+  data.address.street = !data.address.street
+    ? user.address.street
+    : data.address.street;
+
+  const userUpdated = await User.findByIdAndUpdate(id, data, {
+    returnDocument: 'after'
+  });
+
+  return userUpdated;
+};
+
 // * Update to worker type
 // TODO: Downgrade to user type
 export const updateToWorker = async (id, loggedID, data) => {
   if (id !== loggedID) throw createError(401, 'Unauthorized');
 
-  if (data['email'] || data['password'])
-    throw createError(401, 'Email and password cannot be updated here');
+  if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
 
   if (!data.category || !data.expYears)
     throw createError(400, 'Worker must have category and expYears');
@@ -103,3 +131,6 @@ export const updateToWorker = async (id, loggedID, data) => {
 
   return worker;
 };
+
+//TODO: Delete User
+// TODO: Update Mail and Password

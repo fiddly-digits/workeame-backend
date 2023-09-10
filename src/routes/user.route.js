@@ -5,8 +5,9 @@ import {
   register,
   getAll,
   getOne,
-  updateProfile,
-  updateToWorker
+  update,
+  updateToWorker,
+  completeProfile
 } from '../controllers/user.controller.js';
 import {
   validateEmail,
@@ -65,7 +66,7 @@ router.get('/:id', async (req, res) => {
 
 router.patch('/complete/:id', auth, async (req, res) => {
   try {
-    const updatedUser = await updateProfile(
+    const updatedUser = await completeProfile(
       req.params.id,
       req.verifiedID,
       req.body
@@ -74,6 +75,22 @@ router.patch('/complete/:id', auth, async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'User Completed profile successfully',
+      data: updatedUser
+    });
+  } catch (error) {
+    res
+      .status(error.status || 500)
+      .json({ success: false, message: error.message });
+  }
+});
+
+router.patch('/update/:id', auth, async (req, res) => {
+  try {
+    const updatedUser = await update(req.params.id, req.verifiedID, req.body);
+    if (!updatedUser) throw createError(400, 'Error updating user');
+    res.status(200).json({
+      success: true,
+      message: 'User Updated successfully',
       data: updatedUser
     });
   } catch (error) {

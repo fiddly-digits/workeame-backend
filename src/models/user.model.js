@@ -13,6 +13,7 @@ const userSchema = new Schema({
     unique: true,
     trim: true,
     lowercase: true,
+    select: false,
     index: { unique: true }
   },
   isVerified: {
@@ -21,6 +22,7 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
+    select: false,
     required: true
   },
   name: {
@@ -124,12 +126,12 @@ userSchema.methods.comparePassword = async function (clientPassword) {
 //   }
 // });
 
-// userSchema.methods.toJSON = function () {
-//   let obj = this.toObject();
-//   delete obj.__v;
-//   delete obj.email;
-//   delete obj.password;
-//   return obj;
-// };
+userSchema.methods.toJSON = function () {
+  let obj = this.toObject();
+  delete obj.__v;
+  delete obj.email;
+  delete obj.password;
+  return obj;
+};
 
 export const User = model('Users', userSchema, 'Users');
