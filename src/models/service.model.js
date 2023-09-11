@@ -4,8 +4,7 @@ const { Schema, model } = mongoose;
 const serviceSchema = new Schema({
   provider: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'Users'
   },
   name: { type: String, required: true, unique: true },
   description: { type: String, required: true },
@@ -30,7 +29,16 @@ serviceSchema.post('save', async function (doc, next) {
   next();
 });
 
-export const Service = model('Service', serviceSchema, 'Service');
+serviceSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    await this.populate('provider');
+    const { provider } = this;
+    provider.Services.push(this._id);
+    await provider.save();
+  }
+});
+
+export const Service = model('Services', serviceSchema);
 
 //   discounts: {
 //     type: new Schema({

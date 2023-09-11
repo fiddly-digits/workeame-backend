@@ -29,11 +29,8 @@ export const login = async (data) => {
 // * Get all Worker users
 
 export const getAllWorkers = async () => {
-  const users = await User.find({ type: 'worker' }).populate({
-    path: 'service',
-    model: 'Service'
-  });
-
+  // TODO: Check why populate is not working
+  const users = await User.find({ type: 'worker' }).populate('Services');
   return users;
 };
 

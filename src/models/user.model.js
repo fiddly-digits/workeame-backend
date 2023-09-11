@@ -92,10 +92,10 @@ const userSchema = new Schema({
   expYears: {
     type: Number
   },
-  service: [
+  Services: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'Service'
+      ref: 'Services'
     }
   ]
 });
@@ -151,4 +151,4 @@ userSchema.methods.toJSON = function () {
   return obj;
 };
 
-export const User = model('Users', userSchema, 'Users');
+export const User = model('Users', userSchema);

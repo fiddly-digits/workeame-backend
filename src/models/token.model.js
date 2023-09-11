@@ -11,6 +11,6 @@ const tokenSchema = new Schema({
   createdAt: { type: Date, required: true, default: Date.now(), expires: 43200 }
 });
 
-export const Token = model('Token', tokenSchema, 'Token');
+export const Token = model('Token', tokenSchema);
 
 //! This token is for mail verification

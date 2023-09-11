@@ -54,4 +54,4 @@ micrositeSchema.post('findOneAndUpdate', async function (doc) {
   await doc.save();
 });
 
-export const Microsite = model('Microsite', micrositeSchema, 'Microsite');
+export const Microsite = model('Microsite', micrositeSchema);
