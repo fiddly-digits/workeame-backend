@@ -91,7 +91,13 @@ const userSchema = new Schema({
   },
   expYears: {
     type: Number
-  }
+  },
+  service: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Service'
+    }
+  ]
 });
 
 // ! Pre middleware to hash password
