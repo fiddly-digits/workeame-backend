@@ -12,7 +12,6 @@ const router = express.Router();
 // * Create Microsite
 router.post('/create/:id', auth, async (req, res) => {
   try {
-    console.log(req.verifiedID);
     const createdMicrosite = await create(req.body, req.verifiedID);
     if (!createdMicrosite) throw createError(400, 'Error creating microsite');
     res.status(201).json({

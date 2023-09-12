@@ -6,7 +6,7 @@ const serviceSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Users'
   },
-  name: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
   description: { type: String, required: true },
   initialPrice: { type: Number, required: true },
   discount: {

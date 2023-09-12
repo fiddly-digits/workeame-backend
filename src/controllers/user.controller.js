@@ -44,9 +44,22 @@ export const getOne = async (id) => {
 
 // * Update Profile for completion
 export const completeProfile = async (id, data) => {
+  let user = await User.findById(id);
+  if (user.id !== id) throw createError(401, 'Unauthorized'); // ! I think this validation is omitible
+  if (user.isProfileComplete)
+    throw createError(403, 'Profile already completed');
+
   if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
 
-  if (!data.address || !data.phone || !data.documentPhoto || !data.type)
+  if (
+    !data.address.street ||
+    !data.address.city ||
+    !data.address.country ||
+    !data.address.postCode ||
+    !data.phone ||
+    !data.documentPhoto ||
+    !data.type
+  )
     throw createError(400, 'Missing essential data');
 
   if (data.type === 'user' && (data.category || data.expYears))
@@ -55,34 +68,10 @@ export const completeProfile = async (id, data) => {
   if (data.type === 'worker' && (!data.category || !data.expYears))
     throw createError(400, 'Worker must have category and expYears');
 
-  const { address, phone, documentPhoto, category, expYears, type } = data;
-  const { street, city, postCode, country } = address;
-  let user = await User.findOne({ phone });
+  user = await User.findOne({ phone: data.phone });
   if (user && user.id !== id)
     throw createError(400, 'Phone number already registered');
 
-  // ! I think this section is not needed
-  user = await User.findById(id);
-  if (!user) throw createError(404, 'User not found');
-  data.address.city = !data.address.city
-    ? user.address.city
-    : data.address.city;
-  data.address.country = !data.address.country
-    ? user.address.country
-    : data.address.country;
-  data.address.postCode = !data.address.postCode
-    ? user.address.postCode
-    : data.address.postCode;
-  data.address.street = !data.address.street
-    ? user.address.street
-    : data.address.street;
-  data.phone = !data.phone ? user.phone : data.phone;
-  data.documentPhoto = !data.documentPhoto
-    ? user.documentPhoto
-    : data.documentPhoto;
-  data.type = !data.type ? user.type : data.type;
-  data.category = !data.category ? user.category : data.category;
-  data.expYears = !data.expYears ? user.expYears : data.expYears;
   data.isProfileComplete = true;
 
   const userCompleted = await User.findByIdAndUpdate(id, data, {
@@ -93,9 +82,17 @@ export const completeProfile = async (id, data) => {
 };
 
 export const update = async (id, data) => {
+  let user = await User.findById(id);
+  if (user.id !== id) throw createError(401, 'Unauthorized'); // ! I think this validation is omitibl
   if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
 
-  let user = await User.findOne({ phone: data.phone });
+  if (data.type === 'user' && (data.category || data.expYears))
+    throw createError(400, 'User cannot have category nor expYears');
+
+  if (data.type === 'worker' && (!data.category || !data.expYears))
+    throw createError(400, 'Worker must have category and expYears');
+
+  user = await User.findOne({ phone: data.phone });
   if (user && user.id !== id)
     throw createError(400, 'Phone number already registered');
 
@@ -124,14 +121,15 @@ export const update = async (id, data) => {
 
 // * Update to worker type
 export const updateToWorker = async (id, data) => {
+  const user = await User.findById(id);
+  if (user.id !== id) throw createError(401, 'Unauthorized'); // ! I think this validation is omitibl
   if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
+  if (user.type === 'worker') throw createError(400, 'User already a Worker');
 
   if (!data.category || !data.expYears)
     throw createError(400, 'Worker must have category and expYears');
 
-  const user = User.findById(id);
-
-  if (user.type === 'worker') throw createError(400, 'User already a Worker');
+  // user = User.findById(id);
 
   const worker = await User.findByIdAndUpdate(id, data, {
     returnDocument: 'after'
@@ -143,16 +141,15 @@ export const updateToWorker = async (id, data) => {
 // * Update mail
 export const updateMail = async (id, data) => {
   // !Validate that they cannot update anything else than email here
-  let user = await User.findOne({ email: data.email });
+  let user = await User.findById(id);
+  if (user.id !== id) throw createError(401, 'Unauthorized'); // ! I think this validation is omitibl
+  user = await User.findOne({ email: data.email });
   if (user && user.id !== id)
     throw createError(400, 'Email already registered');
   // ! Mail verification goes here
 
   user = await User.findById(id);
   if (!user) throw createError(404, 'User not found');
-
-  // user.email = data.email;
-  // user.isVerified = false;
 
   const userWithNewMail = await User.findByIdAndUpdate(
     id,
@@ -168,6 +165,7 @@ export const updateMail = async (id, data) => {
 export const updatePassword = async (id, data) => {
   let user = await User.findById(id);
   console.log(id);
+  if (user.id !== id) throw createError(401, 'Unauthorized'); // ! I think this validation is omitibl
   if (!user) throw createError(404, 'User not found');
 
   const isMatch = await user.comparePassword(data.oldPassword);
@@ -182,7 +180,7 @@ export const updatePassword = async (id, data) => {
 };
 
 // * Delete User
-// TODO: Delete all user data including microsites
+// TODO: Delete all user data including microsites, services, etc
 export const remove = async (id) => {
   const user = await User.findByIdAndDelete(id);
   if (!user) throw createError(404, 'User not found');

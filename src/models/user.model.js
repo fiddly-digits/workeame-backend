@@ -143,12 +143,13 @@ userSchema.methods.comparePassword = async function (clientPassword) {
 //   }
 // });
 
-userSchema.methods.toJSON = function () {
-  let obj = this.toObject();
-  delete obj.__v;
-  delete obj.password;
-  delete obj.email;
-  return obj;
-};
+// ! Method to remove password and email from response, activate in production
+// userSchema.methods.toJSON = function () {
+//   let obj = this.toObject();
+//   delete obj.__v;
+//   delete obj.password;
+//   delete obj.email;
+//   return obj;
+// };
 
 export const User = model('Users', userSchema);

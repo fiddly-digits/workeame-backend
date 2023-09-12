@@ -68,9 +68,9 @@ router.get('/:id', async (req, res) => {
 
 //* complete profile data
 
-router.patch('/complete/:id', auth, async (req, res) => {
+router.patch('/complete/', auth, async (req, res) => {
   try {
-    const updatedUser = await completeProfile(req.params.id, req.body);
+    const updatedUser = await completeProfile(req.verifiedID, req.body);
     if (!updatedUser) throw createError(400, 'Error updating user');
     res.status(200).json({
       success: true,
@@ -86,9 +86,9 @@ router.patch('/complete/:id', auth, async (req, res) => {
 
 // * Plain Update could be better
 
-router.patch('/update/:id', auth, async (req, res) => {
+router.patch('/update/', auth, async (req, res) => {
   try {
-    const updatedUser = await update(req.params.id, req.body);
+    const updatedUser = await update(req.verifiedID, req.body);
     if (!updatedUser) throw createError(400, 'Error updating user');
     res.status(200).json({
       success: true,
@@ -104,9 +104,9 @@ router.patch('/update/:id', auth, async (req, res) => {
 
 // * Update to worker type
 // TODO: Downgrade to user type
-router.patch('/worker/:id', auth, async (req, res) => {
+router.patch('/workerUpdate/', auth, async (req, res) => {
   try {
-    const UserUpdatedToWorker = await updateToWorker(req.params.id, req.body);
+    const UserUpdatedToWorker = await updateToWorker(req.verifiedID, req.body);
     if (!UserUpdatedToWorker) throw createError(400, 'Error updating user');
     res.status(200).json({
       success: true,
@@ -121,13 +121,13 @@ router.patch('/worker/:id', auth, async (req, res) => {
 });
 
 router.patch(
-  '/mail/:id',
+  '/mailChange/',
   auth,
   validateEmail,
   validationHandler,
   async (req, res) => {
     try {
-      const updateMailUser = await updateMail(req.params.id, req.body);
+      const updateMailUser = await updateMail(req.verifiedID, req.body);
       if (!updateMailUser) throw createError(400, 'Error updating user');
       res.status(200).json({
         success: true,
@@ -143,13 +143,13 @@ router.patch(
 );
 
 router.patch(
-  '/password/:id',
+  '/passwordChange/',
   auth,
   validateNewPassword,
   validationHandler,
   async (req, res) => {
     try {
-      const updatePasswordUser = await updatePassword(req.params.id, req.body);
+      const updatePasswordUser = await updatePassword(req.verifiedID, req.body);
       if (!updatePasswordUser) throw createError(400, 'Error updating user');
       res.status(200).json({
         success: true,
@@ -164,9 +164,9 @@ router.patch(
   }
 );
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/delete/', auth, async (req, res) => {
   try {
-    const deletedUser = await remove(req.params.id);
+    const deletedUser = await remove(req.verifiedID);
     if (!deletedUser) throw createError(400, 'Error deleting user');
     res.status(200).json({
       success: true,
