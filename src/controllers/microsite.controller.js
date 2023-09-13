@@ -2,7 +2,7 @@ import createError from 'http-errors';
 import { Microsite } from '../models/microsite.model.js';
 import { User } from '../models/User.model.js';
 
-export const create = async (data, owner) => {
+export const create = async (owner, data) => {
   let user = await User.findById(owner);
   if (user.type !== 'worker')
     throw createError(403, 'User must be worker to have a microsite');
@@ -14,15 +14,16 @@ export const create = async (data, owner) => {
 };
 
 export const getMicrosite = async (owner) => {
-  const microsite = await Microsite.findOne({ owner });
+  const microsite = await Microsite.findOne({ owner }); // ! Think about if we need to use populate with reference of microsite
   if (!microsite) throw createError(404, 'Microsite not found');
   return microsite;
 };
 
-export const update = async (data, owner) => {
+export const update = async (owner, data) => {
   let microsite = await Microsite.findOne({ owner });
   if (!microsite) throw createError(404, 'Microsite not found');
 
+  // ! Considerate validations for each carousel image, if carousel.image_1 is not provided, we cant register carousel.image_2, etc
   if (data.about.length < 20 || data.about.length > 300)
     throw createError(400, 'About must be between 20 and 300 characters');
 
