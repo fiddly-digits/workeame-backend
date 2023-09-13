@@ -10,9 +10,9 @@ import { auth } from '../middlewares/auth.middleware.js';
 const router = express.Router();
 
 // * Create Microsite
-router.post('/create/:id', auth, async (req, res) => {
+router.post('/create/', auth, async (req, res) => {
   try {
-    const createdMicrosite = await create(req.body, req.verifiedID);
+    const createdMicrosite = await create(req.verifiedID, req.body);
     if (!createdMicrosite) throw createError(400, 'Error creating microsite');
     res.status(201).json({
       success: true,
@@ -44,9 +44,9 @@ router.get('/:id', async (req, res) => {
 });
 
 // * Update Microsite
-router.patch('/update/:id', auth, async (req, res) => {
+router.patch('/update/', auth, async (req, res) => {
   try {
-    const updatedMicrosite = await update(req.body, req.params.id);
+    const updatedMicrosite = await update(req.verifiedID, req.body);
     if (!updatedMicrosite) throw createError(400, 'Error updating microsite');
     res.status(200).json({
       success: true,

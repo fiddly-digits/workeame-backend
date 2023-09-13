@@ -34,18 +34,29 @@
 
 ### Microsite Routes
 
-- `/api/v1/ms/create/:id` 🚧\
-  Create Microsite for User | **Auth Needed and UserID as Param**
-- `/api/v1/ms/:id` 🚧\
-  Get User Microsite | **Auth Needed and UserID as Param**
-- `/api/v1/ms/update/:id` 🚧\
-  Update Microsite | **Auth Needed and UserID as Param**
+- `/api/v1/ms/create/` ✅\
+  Create Microsite for User | **Auth Needed**
+- `/api/v1/ms/:id` ✅\
+  Get User Microsite | **UserID as Param Needed**
+- `/api/v1/ms/update/` ✅\
+  Update Microsite | **Auth Needed**
 
-### Service Route
+  ### Service Route
 
-- `/api/v1/service/create/:id` 🚧\
-  Create one service for one Worker | **Auth Needed and UserID as Param**
-- `/api/v1/service/:id` 🚧\
+- `/api/v1/service/create/` ✅\
+  Create one service for one Worker | **Auth Needed**
+- `/api/v1/service/:id` ✅\
   Get All Services from one Worker | **Auth Needed and UserID as Param**
-- `/api/v1/service/update/:id` 🚧\
-  Update one service | **Auth Needed**
+- `/api/v1/service/update/:id` ✅\
+  Update one service | **Auth Needed and ServiceID as Param**
+- `/api/v1/service/delete/:id` ✅\
+  Update one service | **Auth Needed and ServiceID as Param**
+
+  ### Discounts Routes
+
+- `/api/v1/discount/create/:id` 🚧\
+  Create one discount for one Worker | **Auth Needed and ServiceID as Param**
+- `/api/v1/discount/:id` 🚧\
+  Get All Discounts from one Service | **Auth Needed and ServiceID as Param**
+- `/api/v1/discount/delete/:id` 🚧\
+  Delete one discount | **Auth Needed and DiscountID as Param**
