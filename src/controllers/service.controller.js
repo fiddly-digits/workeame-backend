@@ -1,6 +1,6 @@
 import createError from 'http-errors';
 import { Service } from '../models/service.model.js';
-import { User } from '../models/User.model.js';
+import { User } from '../models/user.model.js';
 
 export const create = async (provider, data) => {
   let user = await User.findById(provider);

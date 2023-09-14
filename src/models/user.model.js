@@ -97,8 +97,19 @@ const userSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: 'Services'
     }
-  ]
+  ],
+  Schedule: {
+    type: [Schema.Types.ObjectId],
+    ref: 'Schedule',
+    validate: [limitValidation(7), 'Schedule cannot have more than 7 days']
+  }
 });
+
+function limitValidation(limit) {
+  return function (val) {
+    return val.length <= limit;
+  };
+}
 
 // ! Pre middleware to hash password
 userSchema.pre('save', async function (next) {

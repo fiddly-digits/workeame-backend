@@ -1,6 +1,6 @@
 import createError from 'http-errors';
 import { Microsite } from '../models/microsite.model.js';
-import { User } from '../models/User.model.js';
+import { User } from '../models/user.model.js';
 
 export const create = async (owner, data) => {
   let user = await User.findById(owner);
