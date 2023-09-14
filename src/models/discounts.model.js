@@ -24,9 +24,20 @@ discountsSchema.pre('save', async function (next) {
   }
 });
 
-discountsSchema.methods.calculateDiscount = function (initialPrice) {
+discountsSchema.post('findOneAndDelete', async function (doc, next) {
+  await doc.populate('service');
+  const { service } = doc;
+  service.Discounts.pull(doc._id);
+  await service.save();
+  next();
+});
+
+discountsSchema.methods.calculatePriceWithDiscount = async function () {
+  this.populate('service');
+  const { service } = this;
+  const initialPrice = service.price;
   this.finalPrice = initialPrice - initialPrice * (this.percentage / 100);
-  return this.finalPrice;
+  await this.save();
 };
 
 export const Discounts = model('Discounts', discountsSchema);

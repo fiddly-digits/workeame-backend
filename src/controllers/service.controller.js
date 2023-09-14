@@ -14,7 +14,7 @@ export const create = async (provider, data) => {
 };
 
 export const get = async (provider) => {
-  let services = await Service.find({ provider });
+  let services = await Service.find({ provider }).populate('Discounts');
   if (!services) throw createError(404, 'Services not found');
   return services;
 };
