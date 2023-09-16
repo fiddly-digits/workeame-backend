@@ -70,4 +70,13 @@
 
 ### Review Routes
 
+- `/api/v1/review/create/:id` ✅\
+  Create Review for One Worker | **Auth Needed and WorkerID as Param**
+- `/api/v1/update/:id` ✅\
+  Update Review for One Worker | **Auth Needed and WorkerID as Param**
+  - `/api/v1/schedule/delete/:id` ✅\
+    Delete Review | **Auth Needed and WorkerID as Param**
+- `/api/v1/score/:id` ✅\
+  Get the Average Score of one worker | **No Auth Needed and WorkerID as Param**
+
 ### Booking Routes
