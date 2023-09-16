@@ -63,6 +63,11 @@
 
 ### Schedule Routes
 
+- `/api/v1/schedule/create/` ✅\
+  Create Schedule for one day of the week | **Auth Needed**
+- `/api/v1/update/` ✅\
+  Update Schedule of one day of the week | **No Auth Needed**
+
 ### Review Routes
 
 ### Booking Routes

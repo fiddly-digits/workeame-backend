@@ -3,7 +3,7 @@ import { Schedule } from '../models/schedule.model.js';
 import { User } from '../models/user.model.js';
 
 export const create = async (worker, data) => {
-  console.log(worker);
+  if (!data.date) throw createError(400, 'Date is required');
   const user = await User.findById(worker);
   if (!user) throw createError(404, 'User not found');
   if (user.type !== 'worker')
@@ -11,6 +11,9 @@ export const create = async (worker, data) => {
 
   data.date = new Date(data.date);
   data['weekday'] = data.date.getDay();
+
+  if (data.availability === false && data.activeHours.length !== 0)
+    data.activeHours = [];
 
   let schedule = await Schedule.findOne({
     Worker: worker,
@@ -25,3 +28,25 @@ export const create = async (worker, data) => {
 };
 
 // TODO: update schedule
+
+export const update = async (worker, data) => {
+  if (!data.date) throw createError(400, 'Date is required');
+  const user = await User.findById(worker);
+  if (!user) throw createError(404, 'User not found');
+  if (user.type !== 'worker')
+    throw createError(403, 'User must be worker to have a schedule');
+
+  data.date = new Date(data.date);
+  data['weekday'] = data.date.getDay();
+  data['Worker'] = worker;
+  if (data.availability === false && data.activeHours.length !== 0)
+    data.activeHours = [];
+
+  const schedule = await Schedule.findOneAndUpdate(
+    { Worker: worker, weekday: data.weekday },
+    data,
+    { returnDocument: 'after' }
+  );
+  if (!schedule) throw createError(404, 'Schedule not found');
+  return schedule;
+};
