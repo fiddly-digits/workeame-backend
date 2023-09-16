@@ -8,6 +8,7 @@ import routerMicrosite from './routes/microsite.route.js';
 import routerService from './routes/service.route.js';
 import routerDiscount from './routes/discount.route.js';
 import routerSchedule from './routes/schedule.route.js';
+import routerReview from './routes/review.route.js';
 
 export const app = express();
 
@@ -22,6 +23,7 @@ app.use('/api/v1/ms', routerMicrosite);
 app.use('/api/v1/service', routerService);
 app.use('/api/v1/discount', routerDiscount);
 app.use('/api/v1/schedule', routerSchedule);
+app.use('/api/v1/review', routerReview);
 
 // * Testing Api
 app.get('/api/v1', (req, res) => {

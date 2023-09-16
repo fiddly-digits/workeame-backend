@@ -102,7 +102,13 @@ const userSchema = new Schema({
     type: [Schema.Types.ObjectId],
     ref: 'Schedule',
     validate: [limitValidation(7), 'Schedule cannot have more than 7 days']
-  }
+  },
+  Reviews: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Reviews'
+    }
+  ]
 });
 
 function limitValidation(limit) {
