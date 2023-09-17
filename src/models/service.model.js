@@ -16,7 +16,13 @@ const serviceSchema = new Schema({
     }
   ],
   isPaymentPerHour: { type: Boolean },
-  status: { type: String, enum: ['active', 'inactive'], default: 'active' }
+  status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+  Bookings: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Bookings'
+    }
+  ]
 });
 
 serviceSchema.post('findOneAndDelete', async function (doc, next) {
