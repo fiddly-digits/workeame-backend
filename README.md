@@ -74,9 +74,18 @@
   Create Review for One Worker | **Auth Needed and WorkerID as Param**
 - `/api/v1/update/:id` ✅\
   Update Review for One Worker | **Auth Needed and WorkerID as Param**
-  - `/api/v1/schedule/delete/:id` ✅\
-    Delete Review | **Auth Needed and WorkerID as Param**
+- `/api/v1/schedule/delete/:id` ✅\
+  Delete Review | **Auth Needed and WorkerID as Param**
 - `/api/v1/score/:id` ✅\
   Get the Average Score of one worker | **No Auth Needed and WorkerID as Param**
 
 ### Booking Routes
+
+- `/api/v1/booking/create/:id` ✅\
+  Create Booking for One Service | **Auth Needed and ServiceID as Param**
+- `/api/v1/booking/reschedule/:id` ✅\
+  Reschedule Booking | **Auth Needed and ServiceID as Param**
+- `/api/v1/booking/statusUpdate/:id` ✅\
+  Change Status of | **Auth Needed and ServiceID as Param**
+- `/api/v1/booking/?type={customer || provider}` ✅\
+  Get All Bookings from one User | **Auth Needed as Param**

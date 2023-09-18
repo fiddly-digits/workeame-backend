@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 const { Schema, model } = mongoose;
 
+// TODO: Add Rating to worker and user
+
 const userSchema = new Schema({
   createdAt: {
     type: Date,
