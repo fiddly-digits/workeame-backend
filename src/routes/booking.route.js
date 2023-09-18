@@ -74,10 +74,10 @@ router.patch('/statusUpdate/:id', auth, async (req, res) => {
   }
 });
 
-// ! Add a query param for this route in order to get client or worker bookings
+// * Get all bookings from user with query param "client" or "provider" to filter
 router.get('/', auth, async (req, res) => {
   try {
-    const bookings = await getBookings(req.verifiedID);
+    const bookings = await getBookings(req.verifiedID, req.query);
     if (!bookings) throw createError(404, 'Bookings not found');
     res.status(200).json({
       success: true,

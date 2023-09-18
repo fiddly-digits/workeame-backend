@@ -122,16 +122,19 @@ export const updateStatus = async (bookingID, id, data) => {
   }
 };
 
-export const getBookings = async (id) => {
-  const isCustomer = await Booking.exists({ customer: id });
-  const isProvider = await Booking.exists({ provider: id });
-  if (!isCustomer && !isProvider) throw createError(401, 'Unauthorized');
-
-  if (isCustomer) {
-    const bookings = await Booking.find({ customer: id });
-    return bookings;
-  } else {
+export const getBookings = async (id, { type }) => {
+  if (!type) throw createError(400, 'Missing type');
+  if (type !== 'provider' && type !== 'customer')
+    throw createError(401, 'Unauthorized');
+  if (type === 'provider') {
+    const isProvider = await Booking.exists({ provider: id });
+    if (!isProvider) throw createError(404, 'Bookings not found');
     const bookings = await Booking.find({ provider: id });
+    return bookings;
+  } else if (type === 'customer') {
+    const isCustomer = await Booking.exists({ customer: id });
+    if (!isCustomer) throw createError(404, 'Bookings not found');
+    const bookings = await Booking.find({ customer: id });
     return bookings;
   }
 };
