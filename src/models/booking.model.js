@@ -25,7 +25,8 @@ const bookingSchema = new Schema({
         const date = new Date(this.start);
         const validDate = new Date(date.setHours(date.getHours() + 1));
         return validDate;
-      }
+      },
+      "End date can't be before start date"
     ],
     default: function () {
       const date = new Date(this.start);
@@ -46,7 +47,8 @@ const bookingSchema = new Schema({
     default: 'pending'
   },
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date }
+  updatedAt: { type: Date },
+  isFlagged: { type: Boolean, default: false }
 });
 
 bookingSchema.pre('save', async function (next) {
