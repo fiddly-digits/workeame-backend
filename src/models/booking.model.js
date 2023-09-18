@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
-import { scheduleJob } from 'node-schedule';
 
 const bookingSchema = new Schema({
   service: {
