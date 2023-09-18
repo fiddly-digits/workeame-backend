@@ -50,3 +50,14 @@ export const update = async (worker, data) => {
   if (!schedule) throw createError(404, 'Schedule not found');
   return schedule;
 };
+
+export const get = async (worker) => {
+  const user = await User.findById(worker);
+  if (!user) throw createError(404, 'User not found');
+  if (user.type !== 'worker')
+    throw createError(403, 'User must be worker to have a schedule');
+
+  const schedule = await Schedule.find({ Worker: worker });
+  if (!schedule) throw createError(404, 'Schedule not found');
+  return schedule;
+};
