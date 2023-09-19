@@ -1,6 +1,10 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model.js';
+import { Token } from '../models/token.model.js';
 import createError from 'http-errors';
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
+import { sendMail } from '../utils/mailsender.util.js';
 
 const { SECRET_KEY } = process.env;
 
@@ -8,7 +12,16 @@ const { SECRET_KEY } = process.env;
 export const register = async (data) => {
   let user = await User.findOne({ email: data.email });
   if (user) throw createError(400, 'Email already registered');
+
   user = await User.create(data);
+
+  const token = await Token.create({
+    user: user._id,
+    token: crypto.randomBytes(16).toString('hex')
+  });
+
+  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/confirmation/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
+  sendMail(user.email, text);
   return user;
 };
 
@@ -16,6 +29,8 @@ export const register = async (data) => {
 export const login = async (data) => {
   const user = await User.findOne({ email: data.email });
   if (!user) throw createError(404, 'User not found');
+  if (!user.isVerified)
+    throw createError(403, 'User not verified, please verify your mail');
 
   const isMatch = await user.comparePassword(data.password);
   if (!isMatch) throw createError(400, 'Invalid credentials');
@@ -139,16 +154,18 @@ export const updateToWorker = async (id, data) => {
 
 // * Update mail
 export const updateMail = async (id, data) => {
-  // !Validate that they cannot update anything else than email here
+  if (Object.keys(data).length !== 1) throw createError(403, 'Forbidden');
   let user = await User.findById(id);
   if (user.id !== id) throw createError(401, 'Unauthorized'); // ! I think this validation is skippable
   user = await User.findOne({ email: data.email });
   if (user && user.id !== id)
     throw createError(400, 'Email already registered');
-  // ! Mail verification goes here
 
   user = await User.findById(id);
   if (!user) throw createError(404, 'User not found');
+
+  if (data.email === user.email)
+    throw createError(400, 'You already have that email');
 
   const userWithNewMail = await User.findByIdAndUpdate(
     id,
@@ -157,6 +174,15 @@ export const updateMail = async (id, data) => {
       returnDocument: 'after'
     }
   );
+
+  const token = await Token.findOneAndUpdate(
+    { user: user._id },
+    { token: crypto.randomBytes(16).toString('hex') },
+    { returnDocument: 'after' }
+  );
+
+  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/confirmation/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
+  sendMail(userWithNewMail.email, text);
   return userWithNewMail;
 };
 
@@ -182,5 +208,40 @@ export const updatePassword = async (id, data) => {
 export const remove = async (id) => {
   const user = await User.findByIdAndDelete(id);
   if (!user) throw createError(404, 'User not found');
+  return user;
+};
+
+export const verificationMail = async (verificationToken, email) => {
+  const token = await Token.findOne({ token: verificationToken });
+  if (!token)
+    throw createError(
+      400,
+      'We were unable to find a valid token. Your token my have expired.'
+    );
+  const user = await User.findOne({ _id: token.user, email: email });
+  if (!user)
+    throw createError(400, 'We were unable to find a user for this token.');
+  if (user.isVerified)
+    throw createError(400, 'This user has already been verified.');
+  user.isVerified = true;
+  await user.save();
+  return user;
+};
+
+export const resendVerificationMail = async (email) => {
+  const user = await User.findOne({ email: email });
+  if (!user) throw createError(404, 'User not found');
+  if (user.isVerified)
+    throw createError(400, 'This account has already been verified.');
+
+  const token = await Token.findOneAndUpdate(
+    { user: user._id },
+    { token: crypto.randomBytes(16).toString('hex') },
+    { returnDocument: 'after' }
+  );
+  //if (!token) throw createError(404, 'Token not found');
+  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/confirmation/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
+  sendMail(user.email, text);
+
   return user;
 };
