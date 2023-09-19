@@ -4,10 +4,9 @@ import { Token } from '../models/token.model.js';
 import createError from 'http-errors';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
+import { sendMail } from '../utils/mailsender.util.js';
 
 const { SECRET_KEY } = process.env;
-const { AWS_SMTP, AWS_PORT, AWS_USER, AWS_PASS } = process.env;
-const { WORKEA_MAIL, WORKEA_VERIFICATION_SUBJECT } = process.env;
 
 // * Register user
 export const register = async (data) => {
@@ -21,23 +20,8 @@ export const register = async (data) => {
     token: crypto.randomBytes(16).toString('hex')
   });
 
-  const transporter = nodemailer.createTransport({
-    host: AWS_SMTP,
-    port: AWS_PORT,
-    secure: false,
-    auth: {
-      user: AWS_USER,
-      pass: AWS_PASS
-    }
-  });
-
-  transporter.sendMail({
-    from: WORKEA_MAIL,
-    to: user.email,
-    subject: WORKEA_VERIFICATION_SUBJECT,
-    text: `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/confirmation/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`
-  });
-
+  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/confirmation/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
+  sendMail(user.email, text);
   return user;
 };
 
@@ -170,16 +154,18 @@ export const updateToWorker = async (id, data) => {
 
 // * Update mail
 export const updateMail = async (id, data) => {
-  // !Validate that they cannot update anything else than email here
+  if (Object.keys(data).length !== 1) throw createError(403, 'Forbidden');
   let user = await User.findById(id);
   if (user.id !== id) throw createError(401, 'Unauthorized'); // ! I think this validation is skippable
   user = await User.findOne({ email: data.email });
   if (user && user.id !== id)
     throw createError(400, 'Email already registered');
-  // ! Mail verification goes here
 
   user = await User.findById(id);
   if (!user) throw createError(404, 'User not found');
+
+  if (data.email === user.email)
+    throw createError(400, 'You already have that email');
 
   const userWithNewMail = await User.findByIdAndUpdate(
     id,
@@ -188,6 +174,15 @@ export const updateMail = async (id, data) => {
       returnDocument: 'after'
     }
   );
+
+  const token = await Token.findOneAndUpdate(
+    { user: user._id },
+    { token: crypto.randomBytes(16).toString('hex') },
+    { returnDocument: 'after' }
+  );
+
+  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/confirmation/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
+  sendMail(userWithNewMail.email, text);
   return userWithNewMail;
 };
 
@@ -245,27 +240,8 @@ export const resendVerificationMail = async (email) => {
     { returnDocument: 'after' }
   );
   //if (!token) throw createError(404, 'Token not found');
-  const transporter = nodemailer.createTransport({
-    host: AWS_SMTP,
-    port: AWS_PORT,
-    secure: false,
-    auth: {
-      user: AWS_USER,
-      pass: AWS_PASS
-    }
-  });
-
-  transporter.sendMail(
-    {
-      from: WORKEA_MAIL,
-      to: user.email,
-      subject: WORKEA_VERIFICATION_SUBJECT,
-      text: `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/confirmation/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`
-    },
-    (error) => {
-      if (error) throw createError(400, 'Error sending verification mail');
-    }
-  );
+  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/confirmation/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
+  sendMail(user.email, text);
 
   return user;
 };
