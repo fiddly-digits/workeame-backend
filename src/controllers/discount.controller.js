@@ -14,7 +14,8 @@ export const create = async (serviceID, provider, data) => {
   });
   if (discount) throw createError(403, 'You already have this discount');
 
-  data['service'] = serviceID;
+  data.service = serviceID;
+  data.provider = provider;
   discount = await Discounts.create(data);
   discount.calculatePriceWithDiscount();
   return discount;

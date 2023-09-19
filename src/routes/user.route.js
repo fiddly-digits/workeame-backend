@@ -103,7 +103,6 @@ router.patch('/update/', auth, async (req, res) => {
 });
 
 // * Update to worker type
-// TODO: Downgrade to user type
 router.patch('/workerUpdate/', auth, async (req, res) => {
   try {
     const UserUpdatedToWorker = await updateToWorker(req.verifiedID, req.body);

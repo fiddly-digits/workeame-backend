@@ -8,7 +8,7 @@ export const auth = async (req, res, next) => {
     const authorization = req.headers.authorization || '';
     const token = authorization.split(' ')[1];
     const isVerified = jwt.verify(token, SECRET_KEY);
-    //if (!isVerified) throw createError(401, 'Unauthorized');
+    // if (!isVerified) throw createError(401, 'Unauthorized');
     //if (isVerified.id !== req.params.id) throw createError(401, 'Unauthorized');
     req.verifiedID = isVerified.id;
     next();

@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 const { Schema, model } = mongoose;
 
-// TODO: Add Rating to worker and user
+// TODO: Add Rating to worker and user in next iteration
 
 const userSchema = new Schema({
   createdAt: {
@@ -144,6 +144,31 @@ userSchema.pre('findOneAndUpdate', async function (next) {
     next(error);
     throw new Error('Error hashing password');
   }
+});
+
+// * Child Reference
+
+// userSchema.post('findOneAndDelete', async function (user) {
+//   if (user.Reviews.length) {
+//     const res = await Review.deleteMany({ _id: { $in: user.Reviews } });
+//     console.log(res);
+//   }
+//   if (user.Services.length)
+//     await Service.deleteMany({ _id: { $in: user.Services } });
+//   if (user.Schedule.length)
+//     await Schedule.deleteMany({ _id: { $in: user.Schedule } });
+// });
+
+// * Parent Reference
+
+userSchema.post('findOneAndDelete', async function (id) {
+  await model('Microsite').deleteMany({ owner: id });
+  await model('Reviews').deleteMany({ worker: id });
+  await model('Services').deleteMany({ provider: id });
+  await model('Schedule').deleteMany({ worker: id });
+  await model('Booking').deleteMany({ customer: id });
+  await model('Booking').deleteMany({ provider: id });
+  await model('Discounts').deleteMany({ provider: id });
 });
 
 // ! Method to compare password

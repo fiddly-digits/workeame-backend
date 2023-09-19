@@ -27,8 +27,6 @@ export const create = async (worker, data) => {
   return schedule;
 };
 
-// TODO: update schedule
-
 export const update = async (worker, data) => {
   if (!data.date) throw createError(400, 'Date is required');
   const user = await User.findById(worker);

@@ -10,8 +10,7 @@ const scheduleSchema = new Schema({
   },
   weekday: {
     type: Number,
-    enum: [0, 1, 2, 3, 4, 5, 6],
-    unique: [true, 'Schedule already created']
+    enum: [0, 1, 2, 3, 4, 5, 6]
   },
   availability: {
     type: Boolean,

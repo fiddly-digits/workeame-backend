@@ -12,7 +12,8 @@ const discountsSchema = new Schema({
     enum: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
     required: true
   },
-  finalPrice: { type: Number }
+  finalPrice: { type: Number },
+  provider: { type: Schema.Types.ObjectId, ref: 'Users' }
 });
 
 discountsSchema.pre('save', async function (next) {
@@ -38,6 +39,12 @@ discountsSchema.methods.calculatePriceWithDiscount = async function () {
   const initialPrice = service.price;
   this.finalPrice = initialPrice - initialPrice * (this.percentage / 100);
   await this.save();
+};
+
+discountsSchema.methods.toJSON = function () {
+  let obj = this.toObject();
+  delete obj.provider;
+  return obj;
 };
 
 export const Discounts = model('Discounts', discountsSchema);

@@ -1,6 +1,5 @@
 import { Booking } from '../models/booking.model.js';
 import { Service } from '../models/service.model.js';
-import { User } from '../models/user.model.js';
 import { Schedule } from '../models/schedule.model.js';
 import createError from 'http-errors';
 

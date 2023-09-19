@@ -29,7 +29,6 @@ export const login = async (data) => {
 // * Get all Worker users
 
 export const getAllWorkers = async () => {
-  // TODO: Check why populate is not working
   const users = await User.find({ type: 'worker' }).populate('Services');
   return users;
 };
@@ -186,5 +185,3 @@ export const remove = async (id) => {
   if (!user) throw createError(404, 'User not found');
   return user;
 };
-
-//TODO: Update Plan
