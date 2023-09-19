@@ -16,7 +16,7 @@ router.post(
     try {
       const token = await login(req.body);
       if (!token) throw createError(400, 'Error creating token');
-      res.status(200).json({ success: true, message: 'User logged in', token }); // ! Remove token from response after testing and after saving it in cookies
+      res.status(200).json({ success: true, message: 'User logged in', token });
     } catch (error) {
       res
         .status(error.status || 500)

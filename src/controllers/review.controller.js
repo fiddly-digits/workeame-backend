@@ -3,7 +3,7 @@ import { Review } from '../models/review.model.js';
 import { User } from '../models/user.model.js';
 import { Service } from '../models/service.model.js';
 
-// TODO: User and worker can review each other in Next iteration
+// ! User and worker can review each other in Next iteration
 
 export const create = async (reviewer, worker, data) => {
   if (reviewer === worker) throw createError(401, 'You cannot review yourself');

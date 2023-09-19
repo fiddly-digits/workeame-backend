@@ -34,7 +34,7 @@ router.post(
       if (!createdUser) throw createError(400, 'Error creating user');
       res
         .status(201)
-        .json({ success: true, message: 'User created', data: createdUser }); // ! Remove data from response after testing
+        .json({ success: true, message: 'User created', data: createdUser }); // TODO: Remove data from response after testing
     } catch (error) {
       res
         .status(error.status || 500)

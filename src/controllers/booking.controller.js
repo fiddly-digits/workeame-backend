@@ -91,7 +91,6 @@ export const updateStatus = async (bookingID, id, data) => {
     booking.clientStatus === 'completed'
   )
     throw createError(403, 'You cannot update a completed booking');
-  // ! Validate date errors
   if (data.status === 'cancelled' && booking.start < new Date())
     throw createError(
       403,

@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 const { Schema, model } = mongoose;
 
-// TODO: Add Rating to worker and user in next iteration
+// ! Add Rating to worker and user in next iteration
 
 const userSchema = new Schema({
   createdAt: {
@@ -187,7 +187,7 @@ userSchema.methods.comparePassword = async function (clientPassword) {
 //   }
 // });
 
-// ! Method to remove password and email from response, activate in production
+// TODO: Method to remove password and email from response, activate in production
 // userSchema.methods.toJSON = function () {
 //   let obj = this.toObject();
 //   delete obj.__v;
