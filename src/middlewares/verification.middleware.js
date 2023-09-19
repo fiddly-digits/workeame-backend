@@ -6,7 +6,7 @@ export const validationHandler = (req, res, next) => {
   if (!errors.isEmpty())
     return res
       .status(400)
-      .json({ success: false, message: errors.array().map((err) => err.msg) }); // ! Just send one error message to evaluate in client
+      .json({ success: false, message: errors.array().map((err) => err.msg) }); // TODO: Just send one error message to evaluate in client in production
   next();
 };
 

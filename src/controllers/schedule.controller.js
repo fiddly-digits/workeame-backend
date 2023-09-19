@@ -27,8 +27,6 @@ export const create = async (worker, data) => {
   return schedule;
 };
 
-// TODO: update schedule
-
 export const update = async (worker, data) => {
   if (!data.date) throw createError(400, 'Date is required');
   const user = await User.findById(worker);
@@ -47,6 +45,17 @@ export const update = async (worker, data) => {
     data,
     { returnDocument: 'after' }
   );
+  if (!schedule) throw createError(404, 'Schedule not found');
+  return schedule;
+};
+
+export const get = async (worker) => {
+  const user = await User.findById(worker);
+  if (!user) throw createError(404, 'User not found');
+  if (user.type !== 'worker')
+    throw createError(403, 'User must be worker to have a schedule');
+
+  const schedule = await Schedule.find({ Worker: worker });
   if (!schedule) throw createError(404, 'Schedule not found');
   return schedule;
 };

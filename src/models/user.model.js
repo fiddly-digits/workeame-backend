@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 const { Schema, model } = mongoose;
 
-// TODO: Add Rating to worker and user
+// ! Add Rating to worker and user in next iteration
 
 const userSchema = new Schema({
   createdAt: {
@@ -146,6 +146,31 @@ userSchema.pre('findOneAndUpdate', async function (next) {
   }
 });
 
+// * Child Reference
+
+// userSchema.post('findOneAndDelete', async function (user) {
+//   if (user.Reviews.length) {
+//     const res = await Review.deleteMany({ _id: { $in: user.Reviews } });
+//     console.log(res);
+//   }
+//   if (user.Services.length)
+//     await Service.deleteMany({ _id: { $in: user.Services } });
+//   if (user.Schedule.length)
+//     await Schedule.deleteMany({ _id: { $in: user.Schedule } });
+// });
+
+// * Parent Reference
+
+userSchema.post('findOneAndDelete', async function (id) {
+  await model('Microsite').deleteMany({ owner: id });
+  await model('Reviews').deleteMany({ worker: id });
+  await model('Services').deleteMany({ provider: id });
+  await model('Schedule').deleteMany({ worker: id });
+  await model('Booking').deleteMany({ customer: id });
+  await model('Booking').deleteMany({ provider: id });
+  await model('Discounts').deleteMany({ provider: id });
+});
+
 // ! Method to compare password
 userSchema.methods.comparePassword = async function (clientPassword) {
   return await bcrypt.compare(clientPassword, this.password);
@@ -162,7 +187,7 @@ userSchema.methods.comparePassword = async function (clientPassword) {
 //   }
 // });
 
-// ! Method to remove password and email from response, activate in production
+// TODO: Method to remove password and email from response, activate in production
 // userSchema.methods.toJSON = function () {
 //   let obj = this.toObject();
 //   delete obj.__v;

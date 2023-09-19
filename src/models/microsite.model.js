@@ -1,8 +1,7 @@
 import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
-// ! Add weblinks and shorter links for social media
-// ! Add a way to bookmark a microsite
+// ! Add a way to bookmark a microsite in next iteration
 
 const micrositeSchema = new Schema({
   createdAt: {

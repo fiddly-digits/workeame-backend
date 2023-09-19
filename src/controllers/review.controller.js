@@ -1,13 +1,17 @@
 import createError from 'http-errors';
 import { Review } from '../models/review.model.js';
 import { User } from '../models/user.model.js';
+import { Service } from '../models/service.model.js';
 
-// TODO: User and worker can review each other
+// ! User and worker can review each other in Next iteration
 
 export const create = async (reviewer, worker, data) => {
   if (reviewer === worker) throw createError(401, 'You cannot review yourself');
   const workerExists = await User.exists({ _id: worker }); // ! change all user existence validations to this
   if (!workerExists) throw createError(404, 'Worker not found');
+  const WorkerHasServices = await Service.exists({ provider: worker });
+  if (!WorkerHasServices)
+    throw createError(403, 'Worker has no services related');
 
   const reviewExists = await Review.exists({ reviewer, worker });
   if (reviewExists) throw createError(403, 'Review already exists');
