@@ -19,6 +19,7 @@ import {
   validationHandler
 } from '../middlewares/verification.middleware.js';
 import { auth } from '../middlewares/auth.middleware.js';
+import { upload } from '../middlewares/multer.middleware.js';
 
 const router = express.Router();
 
@@ -26,11 +27,12 @@ const router = express.Router();
 
 router.post(
   '/register',
+  upload.single('photo'),
   [validateEmail, validatePassword],
   validationHandler,
   async (req, res) => {
     try {
-      const createdUser = await register(req.body);
+      const createdUser = await register(req.body, req.file);
       if (!createdUser) throw createError(400, 'Error creating user');
       res
         .status(201)

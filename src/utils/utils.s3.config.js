@@ -1,25 +1,18 @@
-import 'dotenv/config';
-
-const {
-  AWS_ACCESS_KEY_ID,
-  AWS_SECRET_ACCESS_KEY,
-  AWS_REGION,
-  AWS_BUCKET_NAME
-} = process.env;
+const { AWS_S3_KEY, AWS_S3_SECRET, AWS_S3_REGION, AWS_S3_BUCKET } = process.env;
 
 export default {
   s3: {
     credentials: {
-      accessKeyId: AWS_ACCESS_KEY_ID,
-      secretAccessKey: AWS_SECRET_ACCESS_KEY
+      accessKeyId: AWS_S3_KEY,
+      secretAccessKey: AWS_S3_SECRET
     },
-    region: AWS_REGION,
+    region: AWS_S3_REGION,
     httpOptions: {
       timeout: 90000
     },
     params: {
       ACL: 'public-read',
-      Bucket: AWS_BUCKET_NAME
+      Bucket: AWS_S3_BUCKET
     }
   }
 };

@@ -3,15 +3,17 @@ import { User } from '../models/user.model.js';
 import { Token } from '../models/token.model.js';
 import createError from 'http-errors';
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
 import { sendMail } from '../utils/mailsender.util.js';
 
 const { SECRET_KEY } = process.env;
 
 // * Register user
-export const register = async (data) => {
+export const register = async (data, file) => {
+  if (!file) throw createError(400, 'Missing Photo');
   let user = await User.findOne({ email: data.email });
   if (user) throw createError(400, 'Email already registered');
+
+  data.photo = file.location;
 
   user = await User.create(data);
 

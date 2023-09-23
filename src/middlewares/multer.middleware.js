@@ -1,8 +1,9 @@
 import multer from 'multer';
 import AWS from 'aws-sdk';
-import { S3Client } from 'aws-sdk/clients/s3';
+import { S3Client } from '@aws-sdk/client-s3';
 import multerS3 from 'multer-s3';
 import config from '../utils/utils.s3.config.js';
+console.log(config);
 
 AWS.config.update({
   accessKeyId: config.s3.credentials.accessKeyId,
@@ -17,10 +18,10 @@ const multerS3Config = multerS3({
   bucket: config.s3.params.Bucket,
   acl: config.s3.params.ACL,
   metadata: function (req, file, cb) {
-    cb(null, { fieldName: file.fieldname });
+    cb(null, Date.now().toString() + '-' + file.originalname);
   },
   key: function (req, file, cb) {
-    cb(null, Date.now().toString());
+    cb(null, Date.now().toString() + '.' + file.originalname.split('.')[1]);
   }
 });
 
