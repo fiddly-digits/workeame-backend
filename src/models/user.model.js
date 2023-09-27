@@ -63,7 +63,15 @@ const userSchema = new Schema({
       type: String,
       maxlength: 20
     },
-    city: {
+    locality: {
+      type: String,
+      maxlength: 20
+    },
+    municipality: {
+      type: String,
+      maxlength: 20
+    },
+    state: {
       type: String,
       maxlength: 20
     },
@@ -84,15 +92,18 @@ const userSchema = new Schema({
     sparse: true,
     unique: true
   },
-  documentPhoto: {
-    type: String
+  CURP: {
+    type: String,
+    sparse: true,
+    unique: true
   },
   category: {
     type: String,
-    enum: ['medicina', 'tatuajes', 'entretenimiento']
+    enum: ['Medicina', 'Tatuajes', 'Entretenimiento']
   },
-  expYears: {
-    type: Number
+  expertise: {
+    type: String,
+    enum: ['0-1', '1-2', '2-3', '3-4', '4-5', '5 o mas']
   },
   Services: [
     {

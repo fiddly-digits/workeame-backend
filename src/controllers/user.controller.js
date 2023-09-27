@@ -22,7 +22,7 @@ export const register = async (data, file) => {
     token: crypto.randomBytes(16).toString('hex')
   });
 
-  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/confirmation/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
+  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/verify/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
   sendMail(user.email, text);
   return user;
 };
@@ -69,20 +69,22 @@ export const completeProfile = async (id, data) => {
 
   if (
     !data.address.street ||
-    !data.address.city ||
+    !data.address.locality ||
+    !data.address.municipality ||
+    !data.address.state ||
     !data.address.country ||
     !data.address.postCode ||
     !data.phone ||
-    !data.documentPhoto ||
+    !data.CURP ||
     !data.type
   )
     throw createError(400, 'Missing essential data');
 
-  if (data.type === 'user' && (data.category || data.expYears))
-    throw createError(400, 'User cannot have category nor expYears');
+  if (data.type === 'user' && (data.category || data.expertise))
+    throw createError(400, 'User cannot have category nor expertise');
 
-  if (data.type === 'worker' && (!data.category || !data.expYears))
-    throw createError(400, 'Worker must have category and expYears');
+  if (data.type === 'worker' && (!data.category || !data.expertise))
+    throw createError(400, 'Worker must have category and expertise');
 
   user = await User.findOne({ phone: data.phone });
   if (user && user.id !== id)
@@ -102,11 +104,11 @@ export const update = async (id, data) => {
   if (user.id !== id) throw createError(401, 'Unauthorized'); // ! I think this validation is skippable
   if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
 
-  if (data.type === 'user' && (data.category || data.expYears))
-    throw createError(400, 'User cannot have category nor expYears');
+  if (data.type === 'user' && (data.category || data.expertise))
+    throw createError(400, 'User cannot have category nor expertise');
 
-  if (data.type === 'worker' && (!data.category || !data.expYears))
-    throw createError(400, 'Worker must have category and expYears');
+  if (data.type === 'worker' && (!data.category || !data.expertise))
+    throw createError(400, 'Worker must have category and expertise');
 
   user = await User.findOne({ phone: data.phone });
   if (user && user.id !== id)
@@ -115,18 +117,24 @@ export const update = async (id, data) => {
   user = await User.findById(id);
   if (!user) throw createError(404, 'User not found');
 
-  data.address.city = !data.address.city
-    ? user.address.city
-    : data.address.city;
+  data.address.street = !data.address.street
+    ? user.address.street
+    : data.address.street;
+  data.address.locality = !data.address.locality
+    ? user.address.locality
+    : data.address.locality;
+  data.address.municipality = !data.address.municipality
+    ? user.address.municipality
+    : data.address.municipality;
+  data.address.state = !data.address.state
+    ? user.address.state
+    : data.address.state;
   data.address.country = !data.address.country
     ? user.address.country
     : data.address.country;
   data.address.postCode = !data.address.postCode
     ? user.address.postCode
     : data.address.postCode;
-  data.address.street = !data.address.street
-    ? user.address.street
-    : data.address.street;
 
   const userUpdated = await User.findByIdAndUpdate(id, data, {
     returnDocument: 'after'
@@ -142,8 +150,8 @@ export const updateToWorker = async (id, data) => {
   if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
   if (user.type === 'worker') throw createError(400, 'User already a Worker');
 
-  if (!data.category || !data.expYears)
-    throw createError(400, 'Worker must have category and expYears');
+  if (!data.category || !data.expertise)
+    throw createError(400, 'Worker must have category and expertise');
 
   // user = User.findById(id);
 
@@ -183,7 +191,7 @@ export const updateMail = async (id, data) => {
     { returnDocument: 'after' }
   );
 
-  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/confirmation/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
+  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/verify/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
   sendMail(userWithNewMail.email, text);
   return userWithNewMail;
 };

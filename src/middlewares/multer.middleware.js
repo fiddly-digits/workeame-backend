@@ -3,7 +3,7 @@ import AWS from 'aws-sdk';
 import { S3Client } from '@aws-sdk/client-s3';
 import multerS3 from 'multer-s3';
 import config from '../utils/utils.s3.config.js';
-console.log(config);
+//console.log(config);
 
 AWS.config.update({
   accessKeyId: config.s3.credentials.accessKeyId,
