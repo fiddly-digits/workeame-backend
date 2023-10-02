@@ -47,6 +47,11 @@ const userSchema = new Schema({
     default: 'user',
     required: true
   },
+  isMicrositeCreated: {
+    type: Boolean,
+    default: false,
+    required: true
+  },
   subscription: {
     type: String,
     enum: ['regular', 'premium'],

@@ -53,4 +53,11 @@ micrositeSchema.post('findOneAndUpdate', async function (doc) {
   await doc.save();
 });
 
+micrositeSchema.post('create', async function (doc) {
+  await doc.populate('owner');
+  const { owner } = doc;
+  owner.isMicrositeCreated = true;
+  await owner.save();
+});
+
 export const Microsite = model('Microsite', micrositeSchema);
