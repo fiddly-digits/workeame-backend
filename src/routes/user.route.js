@@ -88,9 +88,9 @@ router.patch('/complete/', auth, async (req, res) => {
 
 // * Plain Update could be better
 
-router.patch('/update/', auth, async (req, res) => {
+router.patch('/update/', upload.single('photo'), auth, async (req, res) => {
   try {
-    const updatedUser = await update(req.verifiedID, req.body);
+    const updatedUser = await update(req.verifiedID, req.body, req.file);
     if (!updatedUser) throw createError(400, 'Error updating user');
     res.status(200).json({
       success: true,

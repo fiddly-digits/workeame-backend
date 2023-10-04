@@ -99,7 +99,7 @@ export const completeProfile = async (id, data) => {
   return userCompleted;
 };
 
-export const update = async (id, data) => {
+export const update = async (id, data, file) => {
   let user = await User.findById(id);
   if (user.id !== id) throw createError(401, 'Unauthorized'); // ! I think this validation is skippable
   if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
@@ -117,24 +117,32 @@ export const update = async (id, data) => {
   user = await User.findById(id);
   if (!user) throw createError(404, 'User not found');
 
-  data.address.street = !data.address.street
-    ? user.address.street
-    : data.address.street;
-  data.address.locality = !data.address.locality
-    ? user.address.locality
-    : data.address.locality;
-  data.address.municipality = !data.address.municipality
-    ? user.address.municipality
-    : data.address.municipality;
-  data.address.state = !data.address.state
-    ? user.address.state
-    : data.address.state;
-  data.address.country = !data.address.country
-    ? user.address.country
-    : data.address.country;
-  data.address.postCode = !data.address.postCode
-    ? user.address.postCode
-    : data.address.postCode;
+  console.log(file);
+
+  if (file) {
+    data.photo = file.location;
+  }
+
+  if (data.address) {
+    data.address.street = !data.address.street
+      ? user.address.street
+      : data.address.street;
+    data.address.locality = !data.address.locality
+      ? user.address.locality
+      : data.address.locality;
+    data.address.municipality = !data.address.municipality
+      ? user.address.municipality
+      : data.address.municipality;
+    data.address.state = !data.address.state
+      ? user.address.state
+      : data.address.state;
+    data.address.country = !data.address.country
+      ? user.address.country
+      : data.address.country;
+    data.address.postCode = !data.address.postCode
+      ? user.address.postCode
+      : data.address.postCode;
+  }
 
   const userUpdated = await User.findByIdAndUpdate(id, data, {
     returnDocument: 'after'
@@ -185,11 +193,19 @@ export const updateMail = async (id, data) => {
     }
   );
 
-  const token = await Token.findOneAndUpdate(
-    { user: user._id },
-    { token: crypto.randomBytes(16).toString('hex') },
-    { returnDocument: 'after' }
-  );
+  let token = await Token.exists({ user: user._id });
+  if (!token) {
+    token = await Token.create({
+      user: user._id,
+      token: crypto.randomBytes(16).toString('hex')
+    });
+  } else {
+    token = await Token.findOneAndUpdate(
+      { user: user._id },
+      { token: crypto.randomBytes(16).toString('hex') },
+      { returnDocument: 'after' }
+    );
+  }
 
   const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/verify/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
   sendMail(userWithNewMail.email, text);
@@ -244,11 +260,19 @@ export const resendVerificationMail = async (email) => {
   if (user.isVerified)
     throw createError(400, 'This account has already been verified.');
 
-  const token = await Token.findOneAndUpdate(
-    { user: user._id },
-    { token: crypto.randomBytes(16).toString('hex') },
-    { returnDocument: 'after' }
-  );
+  let token = await Token.exists({ user: user._id });
+  if (!token) {
+    token = await Token.create({
+      user: user._id,
+      token: crypto.randomBytes(16).toString('hex')
+    });
+  } else {
+    token = await Token.findOneAndUpdate(
+      { user: user._id },
+      { token: crypto.randomBytes(16).toString('hex') },
+      { returnDocument: 'after' }
+    );
+  }
   //if (!token) throw createError(404, 'Token not found');
   const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/confirmation/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
   sendMail(user.email, text);
