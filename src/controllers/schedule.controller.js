@@ -11,6 +11,7 @@ export const create = async (worker, data) => {
 
   data.date = new Date(data.date);
   data['weekday'] = data.date.getDay();
+  console.log(data.date);
 
   if (data.availability === false && data.activeHours.length !== 0)
     data.activeHours = [];
@@ -27,7 +28,7 @@ export const create = async (worker, data) => {
   return schedule;
 };
 
-export const update = async (worker, data) => {
+export const update = async (worker, scheduleID, data) => {
   if (!data.date) throw createError(400, 'Date is required');
   const user = await User.findById(worker);
   if (!user) throw createError(404, 'User not found');
@@ -40,11 +41,9 @@ export const update = async (worker, data) => {
   if (data.availability === false && data.activeHours.length !== 0)
     data.activeHours = [];
 
-  const schedule = await Schedule.findOneAndUpdate(
-    { Worker: worker, weekday: data.weekday },
-    data,
-    { returnDocument: 'after' }
-  );
+  const schedule = await Schedule.findOneAndUpdate({ _id: scheduleID }, data, {
+    returnDocument: 'after'
+  });
   if (!schedule) throw createError(404, 'Schedule not found');
   return schedule;
 };

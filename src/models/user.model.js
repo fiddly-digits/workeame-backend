@@ -49,8 +49,7 @@ const userSchema = new Schema({
   },
   isMicrositeCreated: {
     type: Boolean,
-    default: false,
-    required: true
+    default: false
   },
   subscription: {
     type: String,

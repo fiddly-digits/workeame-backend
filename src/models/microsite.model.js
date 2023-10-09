@@ -42,7 +42,7 @@ const micrositeSchema = new Schema({
   },
   owner: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Users',
     required: true,
     unique: true
   }
@@ -53,11 +53,13 @@ micrositeSchema.post('findOneAndUpdate', async function (doc) {
   await doc.save();
 });
 
-micrositeSchema.post('create', async function (doc) {
-  await doc.populate('owner');
-  const { owner } = doc;
-  owner.isMicrositeCreated = true;
-  await owner.save();
+micrositeSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    await this.populate('owner');
+    const { owner } = this;
+    owner.isMicrositeCreated = true;
+    await owner.save();
+  }
 });
 
 export const Microsite = model('Microsite', micrositeSchema);

@@ -14,7 +14,7 @@ const scheduleSchema = new Schema({
   },
   availability: {
     type: Boolean,
-    default: true
+    default: false
   },
   activeHours: {
     type: [Number],

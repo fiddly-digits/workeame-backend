@@ -29,3 +29,8 @@ export const upload = multer({
   storage: multerS3Config,
   limits: { fileSize: 1000000 }
 });
+
+export const multi_upload = multer({
+  storage: multerS3Config,
+  limits: { fileSize: 1000000 }
+}).array('images', 5);

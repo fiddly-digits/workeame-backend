@@ -22,9 +22,10 @@ router.post('/create/', auth, async (req, res) => {
   }
 });
 
-router.patch('/update/', auth, async (req, res) => {
+router.patch('/update/:id', auth, async (req, res) => {
   try {
-    const userSchedule = await update(req.verifiedID, req.body);
+    console.log(req.body);
+    const userSchedule = await update(req.verifiedID, req.params.id, req.body);
     if (!userSchedule) throw createError(400, 'Error updating schedule');
     res.status(201).json({
       success: true,
@@ -38,7 +39,7 @@ router.patch('/update/', auth, async (req, res) => {
   }
 });
 
-router.get('/get/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const userSchedule = await get(req.params.id);
     if (!userSchedule) throw createError(400, 'Error getting schedule');
