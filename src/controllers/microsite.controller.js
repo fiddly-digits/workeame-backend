@@ -18,7 +18,15 @@ export const create = async (owner, data, files) => {
 };
 
 export const getMicrosite = async (owner) => {
-  const microsite = await Microsite.findOne({ owner });
+  const microsite = await Microsite.findOne({ owner })
+    .populate({
+      path: 'owner',
+      populate: { path: 'Services' }
+    })
+    .populate({
+      path: 'owner',
+      populate: { path: 'Schedule' }
+    });
   if (!microsite) throw createError(404, 'Microsite not found');
   return microsite;
 };

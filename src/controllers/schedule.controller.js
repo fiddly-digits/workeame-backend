@@ -5,7 +5,7 @@ import { User } from '../models/user.model.js';
 export const create = async (worker, data) => {
   if (!data.date) throw createError(400, 'Date is required');
   const user = await User.findById(worker);
-  if (!user) throw createError(404, 'User not found');
+  if (!user) throw createError(404, 'Worker not found');
   if (user.type !== 'worker')
     throw createError(403, 'User must be worker to have a schedule');
 

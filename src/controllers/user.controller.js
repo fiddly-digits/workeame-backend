@@ -66,6 +66,8 @@ export const completeProfile = async (id, data) => {
     throw createError(403, 'Profile already completed');
 
   if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
+  const isCURPRepeated = await User.exists({ CURP: data.CURP });
+  if (isCURPRepeated) throw createError(400, 'CURP already registered');
 
   if (
     !data.address.street ||
