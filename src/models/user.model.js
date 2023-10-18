@@ -103,7 +103,22 @@ const userSchema = new Schema({
   },
   category: {
     type: String,
-    enum: ['Medicina', 'Tatuajes', 'Entretenimiento']
+    enum: [
+      'Belleza y Salud',
+      'Educación',
+      'Tecnología',
+      'Construcción y Remodelación',
+      'Servicios Profesionales',
+      'Cuidado de Mascotas',
+      'Cuidado de Personas',
+      'Deportes y Fitness',
+      'Eventos',
+      'Instalaciones',
+      'Salud',
+      'Transporte',
+      'Limpieza y Hogar',
+      'Freelance y Otros Servicios'
+    ]
   },
   expertise: {
     type: String,

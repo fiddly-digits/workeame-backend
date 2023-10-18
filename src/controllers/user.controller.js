@@ -38,7 +38,7 @@ export const login = async (data) => {
   if (!isMatch) throw createError(400, 'Invalid credentials');
 
   const token = jwt.sign({ id: user._id }, SECRET_KEY, {
-    expiresIn: 90 * 60 // 90 minutes
+    expiresIn: 5 * 60 * 60 // 5 hours
   });
   return token;
 };

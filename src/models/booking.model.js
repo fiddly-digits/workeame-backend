@@ -40,9 +40,16 @@ const bookingSchema = new Schema({
       return date.setHours(date.getHours() + 1);
     }
   },
-  comments: { type: String, default: 'No additional comment provided' },
-  provider: { type: Schema.Types.ObjectId, ref: 'User' },
-  customer: { type: Schema.Types.ObjectId, ref: 'User' },
+  providerComment: {
+    type: String,
+    default: 'No additional comment provided'
+  },
+  customerComment: {
+    type: String,
+    default: 'No additional comment provided'
+  },
+  provider: { type: Schema.Types.ObjectId, ref: 'Users' },
+  customer: { type: Schema.Types.ObjectId, ref: 'Users' },
   workerStatus: {
     type: String,
     enum: ['pending', 'confirmed', 'cancelled', 'completed'],

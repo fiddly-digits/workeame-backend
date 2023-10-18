@@ -45,6 +45,11 @@ const micrositeSchema = new Schema({
     ref: 'Users',
     required: true,
     unique: true
+  },
+  micrositeURL: {
+    type: String,
+    required: true,
+    unique: true
   }
 });
 

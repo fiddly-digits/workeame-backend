@@ -1,6 +1,7 @@
 import createError from 'http-errors';
 import { Microsite } from '../models/microsite.model.js';
 import { User } from '../models/user.model.js';
+import crypto from 'crypto';
 
 export const create = async (owner, data, files) => {
   let user = await User.findById(owner);
@@ -13,12 +14,15 @@ export const create = async (owner, data, files) => {
   files.forEach((file, index) => {
     data['carousel'][`image_${index + 1}`] = file.location;
   });
+  data.micrositeId = `${user.name.toLowerCase()}-${user.category
+    .toLowerCase()
+    .replace(/^\s+|\s+$/gm, '')}-${crypto.randomBytes(5).toString('hex')}`;
   microsite = await Microsite.create(data);
   return microsite;
 };
 
-export const getMicrosite = async (owner) => {
-  const microsite = await Microsite.findOne({ owner })
+export const getMicrosite = async (micrositeURL) => {
+  const microsite = await Microsite.findOne({ micrositeURL })
     .populate({
       path: 'owner',
       populate: { path: 'Services' }
