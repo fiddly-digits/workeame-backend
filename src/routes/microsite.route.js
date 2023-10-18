@@ -37,9 +37,9 @@ router.post(
 );
 
 // * Get Microsite
-router.get('/:id', async (req, res) => {
+router.get('/:micrositeURL', async (req, res) => {
   try {
-    const microsite = await getMicrosite(req.params.id);
+    const microsite = await getMicrosite(req.params.micrositeURL);
     if (!microsite) throw createError(400, 'Error getting microsite');
     res.status(200).json({
       success: true,
