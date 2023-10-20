@@ -3,11 +3,9 @@ import { Discounts } from '../models/discounts.model.js';
 import { Service } from '../models/service.model.js';
 
 export const create = async (serviceID, provider, data) => {
-  console.log(serviceID, provider);
   const service = await Service.findOne({ _id: serviceID, provider });
   if (!service) throw createError(404, 'Service not found');
 
-  console.log(data);
   let discount = await Discounts.findOne({
     percentage: data.percentage,
     service
@@ -34,7 +32,6 @@ export const remove = async (discountID, provider) => {
   if (!service) throw createError(404, 'Service not found');
 
   let discount = await Discounts.findOne({ _id: discountID });
-  console.log(discount);
   if (!discount) throw createError(404, 'Discount not found');
 
   discount = await Discounts.findOneAndDelete({ _id: discountID });

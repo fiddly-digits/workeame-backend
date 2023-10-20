@@ -4,7 +4,8 @@ import {
   create,
   update,
   remove,
-  getScore
+  getScore,
+  getReviews
 } from '../controllers/review.controller.js';
 const router = express.Router();
 
@@ -63,6 +64,22 @@ router.get('/score/:id', async (req, res) => {
       success: true,
       message: 'Score retrieved successfully',
       data: score
+    });
+  } catch (error) {
+    res.status(error.status || 500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+router.get('/reviews/:id', async (req, res) => {
+  try {
+    const reviews = await getReviews(req.params.id);
+    res.status(200).json({
+      success: true,
+      message: 'Reviews retrieved successfully',
+      data: reviews
     });
   } catch (error) {
     res.status(error.status || 500).json({

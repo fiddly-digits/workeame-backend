@@ -119,8 +119,6 @@ export const update = async (id, data, file) => {
   user = await User.findById(id);
   if (!user) throw createError(404, 'User not found');
 
-  console.log(file);
-
   if (file) {
     data.photo = file.location;
   }
@@ -217,7 +215,6 @@ export const updateMail = async (id, data) => {
 // * Update Password
 export const updatePassword = async (id, data) => {
   let user = await User.findById(id);
-  console.log(id);
   if (user.id !== id) throw createError(401, 'Unauthorized'); // ! I think this validation is skippable
   if (!user) throw createError(404, 'User not found');
 
@@ -284,11 +281,8 @@ export const resendVerificationMail = async (email) => {
 
 // * Request password reset
 export const requestPasswordReset = async (email) => {
-  console.log(email);
   const user = await User.findOne({ email });
   if (!user) throw createError(404, 'User not found');
-
-  console.log(user);
 
   const token = await Token.create({
     user: user._id,

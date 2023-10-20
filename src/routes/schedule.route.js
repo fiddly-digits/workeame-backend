@@ -24,7 +24,6 @@ router.post('/create/', auth, async (req, res) => {
 
 router.patch('/update/:id', auth, async (req, res) => {
   try {
-    console.log(req.body);
     const userSchedule = await update(req.verifiedID, req.params.id, req.body);
     if (!userSchedule) throw createError(400, 'Error updating schedule');
     res.status(201).json({

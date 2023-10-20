@@ -57,7 +57,6 @@ router.get('/:id', async (req, res) => {
 // * Get Microsite with Search Param
 router.get('/', async (req, res) => {
   try {
-    console.log(req.query);
     const microsites = await getMicrosites(req.query);
     if (!microsites) throw createError(400, 'Error getting microsite');
     res.status(200).json({
@@ -79,7 +78,6 @@ router.patch(
   auth,
   async (req, res) => {
     try {
-      console.log(req.files);
       const updatedMicrosite = await update(
         req.verifiedID,
         req.body,

@@ -8,7 +8,6 @@ const router = express.Router();
 // * Create Discount
 router.post('/create/:id', auth, async (req, res) => {
   try {
-    console.log(req.params.id, req.verifiedID);
     const createdDiscount = await create(
       req.params.id,
       req.verifiedID,

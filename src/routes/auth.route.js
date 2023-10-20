@@ -53,7 +53,6 @@ router.post('/confirmation/:token', async (req, res) => {
 //*Password Verification
 router.post('/forgotten-password', async (req, res) => {
   try {
-    console.log(req.body.email);
     const mail = await requestPasswordReset(req.body.email);
     res.status(200).json({
       success: true,

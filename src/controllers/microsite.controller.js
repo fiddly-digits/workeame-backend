@@ -37,7 +37,6 @@ export const getMicrosite = async (owner) => {
 
 export const getMicrosites = async (filters) => {
   const { category, state } = filters;
-  console.log(category, state);
   let query = {};
   if (category && state) {
     query = { category: category, 'address.state': state };
@@ -46,7 +45,6 @@ export const getMicrosites = async (filters) => {
   } else if (state) {
     query = { 'address.state': state };
   }
-  console.log(query);
   const microsites = await Microsite.find().populate({
     path: 'owner',
     match: query

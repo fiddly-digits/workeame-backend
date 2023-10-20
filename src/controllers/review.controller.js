@@ -46,3 +46,9 @@ export const getScore = async (worker) => {
   const score = reviews.reduce((acc, review) => acc + review.rating, 0);
   return { worker, score: score / reviews.length };
 };
+
+export const getReviews = async (worker) => {
+  const reviews = await Review.find({ worker });
+  if (!reviews.length) throw createError(404, 'Worker has no reviews');
+  return reviews;
+};

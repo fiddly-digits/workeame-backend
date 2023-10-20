@@ -11,7 +11,6 @@ export const create = async (worker, data) => {
 
   data.date = new Date(data.date);
   data['weekday'] = data.date.getDay();
-  console.log(data.date);
 
   if (data.availability === false && data.activeHours.length !== 0)
     data.activeHours = [];

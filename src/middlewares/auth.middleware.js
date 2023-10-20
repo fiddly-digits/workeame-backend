@@ -4,7 +4,6 @@ const { SECRET_KEY } = process.env;
 
 export const auth = async (req, res, next) => {
   try {
-    console.log(req.path);
     const authorization = req.headers.authorization || '';
     const token = authorization.split(' ')[1];
     const isVerified = jwt.verify(token, SECRET_KEY);

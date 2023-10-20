@@ -6,10 +6,6 @@ import { getNumbersInRange } from '../utils/util.functions.js';
 import { sendMail } from '../utils/mailsender.util.js';
 
 export const create = async (serviceID, customer, data) => {
-  console.log('Service ID: ', serviceID);
-  console.log('Customer: ', customer);
-  console.log('Data: ', data);
-
   const service = await Service.findOne({ _id: serviceID });
   if (!service) throw createError(404, 'Service not found');
   if (customer === service.provider)

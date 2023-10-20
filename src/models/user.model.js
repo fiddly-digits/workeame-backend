@@ -182,19 +182,6 @@ userSchema.pre('findOneAndUpdate', async function (next) {
   }
 });
 
-// * Child Reference
-
-// userSchema.post('findOneAndDelete', async function (user) {
-//   if (user.Reviews.length) {
-//     const res = await Review.deleteMany({ _id: { $in: user.Reviews } });
-//     console.log(res);
-//   }
-//   if (user.Services.length)
-//     await Service.deleteMany({ _id: { $in: user.Services } });
-//   if (user.Schedule.length)
-//     await Schedule.deleteMany({ _id: { $in: user.Schedule } });
-// });
-
 // * Parent Reference
 
 userSchema.post('findOneAndDelete', async function (id) {
@@ -212,23 +199,11 @@ userSchema.methods.comparePassword = async function (clientPassword) {
   return await bcrypt.compare(clientPassword, this.password);
 };
 
-// userSchema.post('save', async function (next) {
-//   try {
-//     this.photo = `https://api.dicebear.com/7.x/identicon/svg?seed=${
-//       Math.floor(Math.random() * 90000) + 10000
-//     }`;
-//   } catch (error) {
-//     next(error);
-//     throw new Error('Error generating photo');
-//   }
-// });
-
-// TODO: Method to remove password from response, activate in production
-// userSchema.methods.toJSON = function () {
-//   let obj = this.toObject();
-//   delete obj.__v;
-//   delete obj.password;
-//   return obj;
-// };
+userSchema.methods.toJSON = function () {
+  let obj = this.toObject();
+  delete obj.__v;
+  delete obj.password;
+  return obj;
+};
 
 export const User = model('Users', userSchema);
