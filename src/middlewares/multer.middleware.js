@@ -3,6 +3,7 @@ import AWS from 'aws-sdk';
 import { S3Client } from '@aws-sdk/client-s3';
 import multerS3 from 'multer-s3';
 import config from '../utils/utils.s3.config.js';
+import crypto from 'crypto';
 
 AWS.config.update({
   accessKeyId: config.s3.credentials.accessKeyId,
@@ -20,7 +21,14 @@ const multerS3Config = multerS3({
     cb(null, Date.now().toString() + '-' + file.originalname);
   },
   key: function (req, file, cb) {
-    cb(null, Date.now().toString() + '.' + file.originalname.split('.')[1]);
+    cb(
+      null,
+      Date.now().toString() +
+        '-' +
+        crypto.randomBytes(5).toString('hex') +
+        '.' +
+        file.originalname.split('.')[1]
+    );
   }
 });
 
