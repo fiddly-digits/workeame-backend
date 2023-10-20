@@ -14,6 +14,7 @@ export const create = async (owner, data, files) => {
   files.forEach((file, index) => {
     data['carousel'][`image_${index + 1}`] = file.location;
   });
+
   data.micrositeURL = `${user.name.toLowerCase()}-${user.category
     .toLowerCase()
     .replace(/^\s+|\s+$/gm, '')}-${crypto.randomBytes(5).toString('hex')}`;
