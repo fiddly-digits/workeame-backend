@@ -50,8 +50,10 @@ export const getMicrosites = async (filters) => {
     path: 'owner',
     match: query
   });
+
   microsites.forEach((microsite) => {
     if (!microsite.owner) {
+      console.log(microsite.owner);
       microsites.splice(microsites.indexOf(microsite), 1);
     }
   });
