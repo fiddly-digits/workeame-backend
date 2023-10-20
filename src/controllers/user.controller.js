@@ -160,8 +160,8 @@ export const updateToWorker = async (id, data) => {
   if (data['email'] || data['password']) throw createError(401, 'Unauthorized');
   if (user.type === 'worker') throw createError(400, 'User already a Worker');
 
-  if (!data.category || !data.expertise)
-    throw createError(400, 'Worker must have category and expertise');
+  if (!data.category || !data.expertise || !data.CLABE)
+    throw createError(400, 'Worker must have category, expertise, and CLABE');
 
   // user = User.findById(id);
 
@@ -280,4 +280,40 @@ export const resendVerificationMail = async (email) => {
   sendMail(user.email, text);
 
   return user;
+};
+
+// * Request password reset
+export const requestPasswordReset = async (email) => {
+  console.log(email);
+  const user = await User.findOne({ email });
+  if (!user) throw createError(404, 'User not found');
+
+  console.log(user);
+
+  const token = await Token.create({
+    user: user._id,
+    token: crypto.randomBytes(16).toString('hex'),
+    type: 'reset'
+  });
+
+  const text = `Hola ${user.name},\n\nPara restablecer tu contraseña, haz click en el siguiente link: \n\nhttp:\/\/workea.me\/reset-password/${token.token}\n\nEste link expira en 24 horas.\n\nGracias por usar Workea`;
+  sendMail(user.email, text, 'Workea.me: Restablecer contraseña');
+  return user.email;
+};
+
+// * Reset password
+export const resetPassword = async (token, password) => {
+  const resetToken = await Token.findOne({
+    token,
+    type: 'reset'
+  }).populate('user');
+  if (!resetToken) throw createError(400, 'Invalid or expired token');
+
+  const user = resetToken.user;
+  const isMatch = await user.comparePassword(password);
+  if (isMatch) throw createError(400, 'Invalid Password');
+  user.password = password;
+  await user.save();
+  const text = `Hola ${user.name},\n\n Tu password ha sido cambiado, si tu no has hecho este cambio, comunícate con nosotros a contacto@workea.me\n\nGracias por usar Workea`;
+  sendMail(user.email, text, 'Workea.me: Tu password ha sido cambiado');
 };

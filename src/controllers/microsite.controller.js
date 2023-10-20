@@ -14,15 +14,15 @@ export const create = async (owner, data, files) => {
   files.forEach((file, index) => {
     data['carousel'][`image_${index + 1}`] = file.location;
   });
-  data.micrositeId = `${user.name.toLowerCase()}-${user.category
+  data.micrositeURL = `${user.name.toLowerCase()}-${user.category
     .toLowerCase()
     .replace(/^\s+|\s+$/gm, '')}-${crypto.randomBytes(5).toString('hex')}`;
   microsite = await Microsite.create(data);
   return microsite;
 };
 
-export const getMicrosite = async (micrositeURL) => {
-  const microsite = await Microsite.findOne({ micrositeURL })
+export const getMicrosite = async (owner) => {
+  const microsite = await Microsite.findOne({ owner })
     .populate({
       path: 'owner',
       populate: { path: 'Services' }
@@ -33,6 +33,30 @@ export const getMicrosite = async (micrositeURL) => {
     });
   if (!microsite) throw createError(404, 'Microsite not found');
   return microsite;
+};
+
+export const getMicrosites = async (filters) => {
+  const { category, state } = filters;
+  console.log(category, state);
+  let query = {};
+  if (category && state) {
+    query = { category: category, 'address.state': state };
+  } else if (category) {
+    query = { category: category };
+  } else if (state) {
+    query = { 'address.state': state };
+  }
+  console.log(query);
+  const microsites = await Microsite.find().populate({
+    path: 'owner',
+    match: query
+  });
+  microsites.forEach((microsite) => {
+    if (!microsite.owner) {
+      microsites.splice(microsites.indexOf(microsite), 1);
+    }
+  });
+  return microsites;
 };
 
 export const update = async (owner, data, files) => {

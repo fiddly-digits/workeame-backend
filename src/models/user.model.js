@@ -124,6 +124,12 @@ const userSchema = new Schema({
     type: String,
     enum: ['0-1', '1-2', '2-3', '3-4', '4-5', '5 o mas']
   },
+  CLABE: {
+    type: String,
+    match: /^\d{18}$/,
+    sparse: true,
+    unique: true
+  },
   Services: [
     {
       type: Schema.Types.ObjectId,
@@ -217,12 +223,11 @@ userSchema.methods.comparePassword = async function (clientPassword) {
 //   }
 // });
 
-// TODO: Method to remove password and email from response, activate in production
+// TODO: Method to remove password from response, activate in production
 // userSchema.methods.toJSON = function () {
 //   let obj = this.toObject();
 //   delete obj.__v;
 //   delete obj.password;
-//   delete obj.email;
 //   return obj;
 // };
 

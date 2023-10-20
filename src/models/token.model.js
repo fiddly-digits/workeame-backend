@@ -7,6 +7,12 @@ const tokenSchema = new Schema({
     ref: 'Users',
     required: true
   },
+  type: {
+    type: String,
+    required: true,
+    enum: ['verify', 'reset'],
+    default: 'verify'
+  },
   token: { type: String, required: true },
   createdAt: { type: Date, required: true, default: Date.now(), expires: 43200 }
 });

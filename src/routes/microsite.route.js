@@ -3,7 +3,8 @@ import createError from 'http-errors';
 import {
   create,
   update,
-  getMicrosite
+  getMicrosite,
+  getMicrosites
 } from '../controllers/microsite.controller.js';
 import { auth } from '../middlewares/auth.middleware.js';
 import { upload } from '../middlewares/multer.middleware.js';
@@ -37,14 +38,32 @@ router.post(
 );
 
 // * Get Microsite
-router.get('/:micrositeURL', async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const microsite = await getMicrosite(req.params.micrositeURL);
+    const microsite = await getMicrosite(req.params.id);
     if (!microsite) throw createError(400, 'Error getting microsite');
     res.status(200).json({
       success: true,
       message: 'Microsite retrieved successfully',
       data: microsite
+    });
+  } catch (error) {
+    res
+      .status(error.status || 500)
+      .json({ success: false, message: error.message });
+  }
+});
+
+// * Get Microsite with Search Param
+router.get('/', async (req, res) => {
+  try {
+    console.log(req.query);
+    const microsites = await getMicrosites(req.query);
+    if (!microsites) throw createError(400, 'Error getting microsite');
+    res.status(200).json({
+      success: true,
+      message: 'Microsites retrieved successfully',
+      data: microsites
     });
   } catch (error) {
     res

@@ -4,7 +4,7 @@ import createError from 'http-errors';
 const { AWS_SMTP, AWS_PORT, AWS_USER, AWS_PASS } = process.env;
 const { WORKEA_MAIL, WORKEA_VERIFICATION_SUBJECT } = process.env;
 
-export function sendMail(email, text) {
+export function sendMail(email, text, subject) {
   const transporter = nodemailer.createTransport({
     host: AWS_SMTP,
     port: AWS_PORT,
@@ -18,7 +18,7 @@ export function sendMail(email, text) {
     {
       from: WORKEA_MAIL,
       to: email,
-      subject: WORKEA_VERIFICATION_SUBJECT,
+      subject: subject || WORKEA_VERIFICATION_SUBJECT,
       text: text
     },
     (error) => {

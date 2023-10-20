@@ -2,7 +2,9 @@ import express from 'express';
 import {
   login,
   verificationMail,
-  resendVerificationMail
+  resendVerificationMail,
+  requestPasswordReset,
+  resetPassword
 } from '../controllers/user.controller.js';
 import {
   validateEmail,
@@ -40,6 +42,36 @@ router.post('/confirmation/:token', async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'The account has been verified. Please log in.'
+    });
+  } catch (error) {
+    res
+      .status(error.status || 500)
+      .json({ success: false, message: error.message });
+  }
+});
+
+//*Password Verification
+router.post('/forgotten-password', async (req, res) => {
+  try {
+    console.log(req.body.email);
+    const mail = await requestPasswordReset(req.body.email);
+    res.status(200).json({
+      success: true,
+      message: 'A reset email has been sent to ' + mail + '.'
+    });
+  } catch (error) {
+    res
+      .status(error.status || 500)
+      .json({ success: false, message: error.message });
+  }
+});
+
+router.patch('/reset-password/:token', async (req, res) => {
+  try {
+    const user = await resetPassword(req.params.token, req.body.password);
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successful. Please login with your new password.'
     });
   } catch (error) {
     res
