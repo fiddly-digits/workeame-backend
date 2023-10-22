@@ -4,7 +4,8 @@ import {
   create,
   update,
   getMicrosite,
-  getMicrosites
+  getMicrosites,
+  getMicrositeByURL
 } from '../controllers/microsite.controller.js';
 import { auth } from '../middlewares/auth.middleware.js';
 import { upload } from '../middlewares/multer.middleware.js';
@@ -38,9 +39,25 @@ router.post(
 );
 
 // * Get Microsite
-router.get('/:id', async (req, res) => {
+// router.get('/:id', async (req, res) => {
+//   try {
+//     const microsite = await getMicrosite(req.params.id);
+//     if (!microsite) throw createError(400, 'Error getting microsite');
+//     res.status(200).json({
+//       success: true,
+//       message: 'Microsite retrieved successfully',
+//       data: microsite
+//     });
+//   } catch (error) {
+//     res
+//       .status(error.status || 500)
+//       .json({ success: false, message: error.message });
+//   }
+// });
+
+router.get('/:MicrositeURL', async (req, res) => {
   try {
-    const microsite = await getMicrosite(req.params.id);
+    const microsite = await getMicrositeByURL(req.params.MicrositeURL);
     if (!microsite) throw createError(400, 'Error getting microsite');
     res.status(200).json({
       success: true,

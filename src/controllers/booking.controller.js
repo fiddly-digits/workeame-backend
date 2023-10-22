@@ -116,6 +116,10 @@ export const updateStatus = async (bookingID, id, data) => {
       'You cannot complete a booking that has not yet ended'
     );
 
+  if (data.status === 'cancelled') {
+    data.timeslot = [];
+  }
+
   if (isCustomer) {
     const booking = await Booking.findOneAndUpdate(
       { _id: bookingID, customer: id },

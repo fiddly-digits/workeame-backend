@@ -29,12 +29,18 @@ const scheduleSchema = new Schema({
   }
 });
 
-scheduleSchema.pre('save', async function (next) {
+scheduleSchema.pre('save', async function () {
   if (this.isNew) {
     await this.populate('Worker');
     const { Worker } = this;
     Worker.Schedule.push(this._id);
     await Worker.save();
+  }
+});
+
+scheduleSchema.pre('save', async function () {
+  if (this.availability === true && this.activeHours.length === 0) {
+    this.availability = false;
   }
 });
 

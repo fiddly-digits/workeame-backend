@@ -9,3 +9,12 @@ export function getNumbersInRange(a, b) {
 
   return numbers;
 }
+
+export function normalizeString(str) {
+  const regex = /[^a-zA-Z0-9]/g;
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(regex, '')
+    .toLowerCase();
+}

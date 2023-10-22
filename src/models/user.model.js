@@ -51,6 +51,11 @@ const userSchema = new Schema({
     type: Boolean,
     default: false
   },
+  micrositeURL: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
   subscription: {
     type: String,
     enum: ['regular', 'premium'],

@@ -37,7 +37,7 @@ const micrositeSchema = new Schema({
   about: {
     type: String,
     minLength: 20,
-    maxLenght: 300,
+    maxLength: 300,
     required: true
   },
   owner: {
@@ -63,6 +63,7 @@ micrositeSchema.pre('save', async function (next) {
     await this.populate('owner');
     const { owner } = this;
     owner.isMicrositeCreated = true;
+    owner.micrositeURL = this.micrositeURL;
     await owner.save();
   }
 });
