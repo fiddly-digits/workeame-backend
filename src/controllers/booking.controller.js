@@ -100,7 +100,7 @@ export const updateStatus = async (bookingID, id, data) => {
     throw createError(403, 'You cannot update a cancelled booking');
 
   if (
-    booking.workerStatus === 'completed' ||
+    booking.workerStatus === 'completed' &&
     booking.clientStatus === 'completed'
   )
     throw createError(403, 'You cannot update a completed booking');
@@ -144,12 +144,56 @@ export const getBookings = async (id, { type }) => {
   if (type === 'provider') {
     const isProvider = await Booking.exists({ provider: id });
     //if (!isProvider) throw createError(404, 'Bookings not found');
-    const bookings = await Booking.find({ provider: id }).populate('customer');
+    const bookings = await Booking.find({ provider: id })
+      .populate('customer')
+      .populate('service');
     return bookings;
   } else if (type === 'customer') {
     const isCustomer = await Booking.exists({ customer: id });
     //if (!isCustomer) throw createError(404, 'Bookings not found');
-    const bookings = await Booking.find({ customer: id }).populate('provider');
+    const bookings = await Booking.find({ customer: id })
+      .populate('provider')
+      .populate('service');
     return bookings;
   }
+};
+
+export const paymentUpdated = async (bookingID, payerID, data) => {
+  let booking = await Booking.findById({ _id: bookingID, customer: payerID })
+    .populate('provider')
+    .populate('customer');
+  if (!booking) throw createError(404, 'Booking not found');
+  // console.log(Object.keys(booking.isPaypalPaymentCompleted).length === 2);
+  if (booking.isPaypalPaymentCompleted.status === 'COMPLETED')
+    throw createError(403, 'Payment is already completed');
+  if (booking.clientStatus === 'cancelled')
+    throw createError(403, 'You cannot complete a cancelled booking');
+  if (booking.clientStatus === 'completed')
+    throw createError(403, 'You cannot complete a completed booking');
+  const providerMailInfo = {
+    email: booking.provider.email,
+    name: booking.provider.name
+  };
+  const customerMailInfo = {
+    email: booking.customer.email,
+    name: booking.customer.name
+  };
+
+  booking = await Booking.findOneAndUpdate(
+    { _id: bookingID },
+    { isPaypalPaymentCompleted: data },
+    { returnDocument: 'after' }
+  );
+
+  sendMail(
+    providerMailInfo.email,
+    `El pago de la reserva ${booking.name} por la cantidad de $${booking.isPaypalPaymentCompleted?.payedAmount} MXN de ${customerMailInfo.name} ha sido recibido. \n\n Gracias por usar Workea`,
+    'Workea.me - Pago Recibido'
+  );
+  sendMail(
+    customerMailInfo.email,
+    `El pago de la reserva ${booking.name} por $${booking.isPaypalPaymentCompleted?.payedAmount} MXN ha sido completado. \n\n Gracias por usar Workea`,
+    'Workea.me - Pago Completado'
+  );
+  return booking;
 };

@@ -4,7 +4,8 @@ import {
   create,
   updateDate,
   updateStatus,
-  getBookings
+  getBookings,
+  paymentUpdated
 } from '../controllers/booking.controller.js';
 import createError from 'http-errors';
 
@@ -88,6 +89,27 @@ router.get('/', auth, async (req, res) => {
     res
       .status(error.status || 500)
       .json({ success: false, message: error.message });
+  }
+});
+
+router.patch('/paymentUpdate/:id', auth, async (req, res) => {
+  try {
+    const booking = await paymentUpdated(
+      req.params.id,
+      req.verifiedID,
+      req.body
+    );
+    if (!booking) throw createError(400, 'Error updating booking');
+    res.status(200).json({
+      success: true,
+      message: 'Booking payment updated successfully',
+      data: booking
+    });
+  } catch (error) {
+    res.status(error.status || 500).json({
+      success: false,
+      message: error.message
+    });
   }
 });
 

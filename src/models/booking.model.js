@@ -60,6 +60,17 @@ const bookingSchema = new Schema({
     enum: ['pending', 'confirmed', 'cancelled', 'completed'],
     default: 'pending'
   },
+  isPaypalPaymentCompleted: {
+    order: {
+      type: String
+    },
+    status: {
+      type: String
+    },
+    payedAmount: {
+      type: Number
+    }
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date },
   isFlagged: { type: Boolean, default: false }
