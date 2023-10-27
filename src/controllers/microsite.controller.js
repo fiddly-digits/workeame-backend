@@ -2,6 +2,7 @@ import createError from 'http-errors';
 import { Microsite } from '../models/microsite.model.js';
 import { User } from '../models/user.model.js';
 import crypto from 'crypto';
+import { normalizeString } from '../utils/util.functions.js';
 
 export const create = async (owner, data, files) => {
   let user = await User.findById(owner);
@@ -15,10 +16,24 @@ export const create = async (owner, data, files) => {
     data['carousel'][`image_${index + 1}`] = file.location;
   });
 
-  data.micrositeURL = `${user.name.toLowerCase()}-${user.category
-    .toLowerCase()
-    .replace(/^\s+|\s+$/gm, '')}-${crypto.randomBytes(5).toString('hex')}`;
+  data.micrositeURL = `${normalizeString(user.name)}-${normalizeString(
+    user.category
+  )}-${crypto.randomBytes(5).toString('hex')}`;
   microsite = await Microsite.create(data);
+  return microsite;
+};
+
+export const getMicrositeByURL = async (micrositeURL) => {
+  const microsite = await Microsite.findOne({ micrositeURL })
+    .populate({
+      path: 'owner',
+      populate: { path: 'Services' }
+    })
+    .populate({
+      path: 'owner',
+      populate: { path: 'Schedule' }
+    });
+  if (!microsite) throw createError(404, 'Microsite not found');
   return microsite;
 };
 
@@ -50,12 +65,12 @@ export const getMicrosites = async (filters) => {
     path: 'owner',
     match: query
   });
-  microsites.forEach((microsite) => {
-    if (!microsite.owner) {
-      microsites.splice(microsites.indexOf(microsite), 1);
-    }
-  });
-  return microsites;
+
+  const filteredMicrosites = microsites.filter(
+    (microsite) => microsite.owner !== null
+  );
+
+  return filteredMicrosites;
 };
 
 export const update = async (owner, data, files) => {
