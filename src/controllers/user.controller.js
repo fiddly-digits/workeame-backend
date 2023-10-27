@@ -112,9 +112,12 @@ export const update = async (id, data, file) => {
   if (data.type === 'worker' && (!data.category || !data.expertise))
     throw createError(400, 'Worker must have category and expertise');
 
-  user = await User.findOne({ phone: data.phone });
-  if (user && user.id !== id)
-    throw createError(400, 'Phone number already registered');
+  if (data.phone) {
+    user = await User.findOne({ phone: data.phone });
+    console.log(user);
+    if (user && user.id !== id)
+      throw createError(403, 'Phone number already registered');
+  }
 
   user = await User.findById(id);
   if (!user) throw createError(404, 'User not found');
