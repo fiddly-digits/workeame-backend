@@ -10,7 +10,6 @@ export const create = async (worker, data) => {
     throw createError(403, 'User must be worker to have a schedule');
 
   data.date = new Date(data.date);
-  data['weekday'] = data.date.getDay();
 
   if (data.availability === false && data.activeHours.length !== 0)
     data.activeHours = [];
