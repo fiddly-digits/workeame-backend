@@ -118,19 +118,21 @@ export const updateStatus = async (bookingID, id, data) => {
 
   if (data.status === 'cancelled') {
     data.timeslot = [];
+  } else {
+    data.timeslot = booking.timeslot;
   }
 
   if (isCustomer) {
     const booking = await Booking.findOneAndUpdate(
       { _id: bookingID, customer: id },
-      { clientStatus: data.status },
+      { clientStatus: data.status, timeslot: data.timeslot },
       { returnDocument: 'after' }
     );
     return booking;
   } else {
     const booking = await Booking.findOneAndUpdate(
       { _id: bookingID, provider: id },
-      { workerStatus: data.status },
+      { workerStatus: data.status, timeslot: data.timeslot },
       { returnDocument: 'after' }
     );
     return booking;
