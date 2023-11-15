@@ -276,7 +276,7 @@ export const resendVerificationMail = async (email) => {
     );
   }
   //if (!token) throw createError(404, 'Token not found');
-  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/confirmation/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
+  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/verify/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
   sendMail(user.email, text);
 
   return user;
