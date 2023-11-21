@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 
+const { CORS_ORIGIN, PORT } = process.env;
+const port = PORT || 8080;
+
 // * Import Routes
 import routerUser from './routes/user.route.js';
 import routerAuth from './routes/auth.route.js';
@@ -14,7 +17,11 @@ import routerBooking from './routes/booking.route.js';
 export const app = express();
 
 // * Middleware cors and parse.json are required to use Express
-app.use(cors());
+app.use(
+  cors({
+    origin: CORS_ORIGIN || `http://localhost:${port}`
+  })
+);
 app.use(express.json());
 
 // * Routes
