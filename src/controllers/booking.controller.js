@@ -22,8 +22,6 @@ export const create = async (serviceID, customer, data) => {
   if (!schedule.activeHours.includes(data.start.getHours()))
     throw createError(403, 'Worker is not available at this hour');
 
-  data.timeslot = getNumbersInRange(data.start.getHours(), data.end.getHours());
-
   let booking = await Booking.exists({
     provider: service.provider,
     start: data.start
