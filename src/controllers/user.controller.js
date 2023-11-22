@@ -3,7 +3,12 @@ import { User } from '../models/user.model.js';
 import { Token } from '../models/token.model.js';
 import createError from 'http-errors';
 import crypto from 'crypto';
-import { sendMail } from '../utils/mailsender.util.js';
+import {
+  sendVerificationMail,
+  successVerificationMail,
+  forgottenPasswordMail,
+  passwordChangedMail
+} from '../utils/mailsender.util.js';
 
 const { SECRET_KEY } = process.env;
 
@@ -21,9 +26,8 @@ export const register = async (data, file) => {
     user: user._id,
     token: crypto.randomBytes(16).toString('hex')
   });
-
-  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/verify/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
-  sendMail(user.email, text);
+  const verificationLink = `https://workea.me/verify/${token.token}`;
+  sendVerificationMail(user.name, user.email, verificationLink);
   return user;
 };
 
@@ -210,8 +214,12 @@ export const updateMail = async (id, data) => {
     );
   }
 
-  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/verify/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
-  sendMail(userWithNewMail.email, text);
+  const verificationLink = `https://workea.me/verify/${token.token}`;
+  sendVerificationMail(
+    userWithNewMail.name,
+    userWithNewMail.email,
+    verificationLink
+  );
   return userWithNewMail;
 };
 
@@ -253,6 +261,7 @@ export const verificationMail = async (verificationToken, email) => {
     throw createError(400, 'This user has already been verified.');
   user.isVerified = true;
   await user.save();
+  successVerificationMail(user.name, user.email);
   return user;
 };
 
@@ -276,8 +285,8 @@ export const resendVerificationMail = async (email) => {
     );
   }
   //if (!token) throw createError(404, 'Token not found');
-  const text = `Hola ${user.name},\n\nPor favor verifica tu cuenta haciendo click en el siguiente link: \n\nhttp:\/\/workea.me\/verify/${token.token}\n\n y confirma el email que registraste con nosotros \n\n gracias por unirte a Workea`;
-  sendMail(user.email, text);
+  const verificationLink = `https://workea.me/verify/${token.token}`;
+  sendVerificationMail(user.name, user.email, verificationLink);
 
   return user;
 };
@@ -293,8 +302,8 @@ export const requestPasswordReset = async (email) => {
     type: 'reset'
   });
 
-  const text = `Hola ${user.name},\n\nPara restablecer tu contraseña, haz click en el siguiente link: \n\nhttp:\/\/workea.me\/reset-password/${token.token}\n\nEste link expira en 24 horas.\n\nGracias por usar Workea`;
-  sendMail(user.email, text, 'Workea.me: Restablecer contraseña');
+  const verificationLink = `https://workea.me/reset-password/${token.token}`;
+  forgottenPasswordMail(user.name, user.email, verificationLink);
   return user.email;
 };
 
@@ -311,6 +320,5 @@ export const resetPassword = async (token, password) => {
   if (isMatch) throw createError(400, 'Invalid Password');
   user.password = password;
   await user.save();
-  const text = `Hola ${user.name},\n\n Tu password ha sido cambiado, si tu no has hecho este cambio, comunícate con nosotros a contacto@workea.me\n\nGracias por usar Workea`;
-  sendMail(user.email, text, 'Workea.me: Tu password ha sido cambiado');
+  passwordChangedMail(user.name, user.email);
 };

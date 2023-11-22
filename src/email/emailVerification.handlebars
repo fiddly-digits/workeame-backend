@@ -1,0 +1,46 @@
+<title>Verify Your Email</title>
+<style type='text/css'>
+
+  body { font-family: 'Roboto', sans-serif; } .container { width: 100%; height:
+  100%; } .container img { width: 100%; height: 100%; object-fit: cover; }
+  button { background-color: black; color: white; font-family: 'Oswald',
+  sans-serif; font-weight: bold; border: none; padding: 10px 20px;
+  text-decoration: none; display: inline-block; font-size: 16px; margin: 4px
+  2px; cursor: pointer; border-radius: 5px;} .disclaimer { font-size: 10px; }
+
+</style>
+
+<div class='container'>
+  <a href='https://workea.me'>
+    <img src='{{appLogoUrl}}' alt='app_logo' />
+  </a>
+</div>
+
+<div><hr /></div>
+
+<h2>Hola {{userName}}</h2>
+
+<p>Gracias por registrarte en Workea. Por favor verifica tu cuenta haciendo
+  click en el siguiente link</p>
+
+<div>
+  <a href='{{verificationLink}}'>
+    <button type='button'>Verify</button>
+  </a>
+</div>
+
+<p>y confirma el email que registraste con nosotros. Recuerda que este enlace
+  expira en 24 horas</p>
+
+<hr />
+
+<div>El boton no funciona? intenta pegar este enlace en tu navegador.</div>
+
+<div>
+  <a href='{{verificationLink}}'>{{verificationLink}}</a>
+</div>
+
+<div><hr />
+  <p class='disclaimer'>Este es un correo automatizado favor de no responderlo.
+    Hecho con ❤️ por el equipo de Workea.</p>
+</div>
