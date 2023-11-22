@@ -3,7 +3,7 @@ import { Service } from '../models/service.model.js';
 import { Schedule } from '../models/schedule.model.js';
 import createError from 'http-errors';
 import { getNumbersInRange } from '../utils/util.functions.js';
-import { sendMail } from '../utils/mailsender.util.js';
+import { paymentConfirmedMail } from '../utils/mailsender.util.js';
 
 export const create = async (serviceID, customer, data) => {
   const service = await Service.findOne({ _id: serviceID });
@@ -185,14 +185,16 @@ export const paymentUpdated = async (bookingID, payerID, data) => {
     { returnDocument: 'after' }
   );
 
-  sendMail(
+  paymentConfirmedMail(
     providerMailInfo.email,
-    `El pago de la reserva ${booking.name} por la cantidad de $${booking.isPaypalPaymentCompleted?.payedAmount} MXN de ${customerMailInfo.name} ha sido recibido. \n\n Gracias por usar Workea`,
+    `El pago de la reserva ${booking.name} por la cantidad de $${booking.isPaypalPaymentCompleted?.payedAmount} MXN de ${customerMailInfo.name} ha sido recibido.`,
+    providerMailInfo.name,
     'Workea.me - Pago Recibido'
   );
-  sendMail(
+  paymentConfirmedMail(
     customerMailInfo.email,
-    `El pago de la reserva ${booking.name} por $${booking.isPaypalPaymentCompleted?.payedAmount} MXN ha sido completado. \n\n Gracias por usar Workea`,
+    `El pago de la reserva ${booking.name} de ${providerMailInfo.name} por $${booking.isPaypalPaymentCompleted?.payedAmount} MXN ha sido completado.`,
+    customerMailInfo.name,
     'Workea.me - Pago Completado'
   );
   return booking;
