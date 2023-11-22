@@ -118,7 +118,6 @@ export const update = async (id, data, file) => {
 
   if (data.phone) {
     user = await User.findOne({ phone: data.phone });
-    console.log(user);
     if (user && user.id !== id)
       throw createError(403, 'Phone number already registered');
   }
